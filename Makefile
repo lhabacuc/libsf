@@ -1,11 +1,14 @@
-# Nome do compilador
+# libsf
 CC = gcc
 
 CFLAGS = `pkg-config --cflags gtk+-3.0`
 
 LIB_NAME = libsf.a
 
-OBSJ = lib_sf.c libsf_db.c
+OBSJ = lib_sf.c \
+	libsf_db.c \
+	libmap.c \
+	libsf_init.c 
 
 SRC = $(OBSJ)
 OBJ = $(SRC:.c=.o)
