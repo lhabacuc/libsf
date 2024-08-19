@@ -4,10 +4,12 @@
 # include <stdlib.h>
 # include <string.h>
 # include <sys/stat.h>
+# include <math.h>
+# include <cairo.h>
 # include <gtk/gtk.h>
 # include <errno.h>
 # include "libsff.h"
-
+# include "libsf_run.h"
 //gcc -o app t.c -I./libsf-s -L./libsf-s -lsf `pkg-config --cflags --libs gtk+-3.0`
 
 // Estrutura para gerenciar diferentes janelas no aplicativo
@@ -69,29 +71,32 @@ typedef struct s_entry
 	char *texto;              
 	guint32 cor;              
 	guint32 textcor;          
-	guint32 bcor;             
+	guint32 bcor;
 	gboolean (*func)(Tool *, gpointer);
-	int bord;                 
-	Status visivel;           
-	int trans;                
+	int bord;
+	int	event;
+	Status visivel;
+	int trans;
 	gpointer dados_adicionais;
 } Edtext;
 
+typedef	gboolean (*ButtonCallbackFunc)(Tool *widget, cairo_t *cr, gpointer data);
 
 typedef struct s_butoon
 {
-	Tool    *Ob;      
-	Tool     *fixed;  
-	int          x;        
-	int          y;             
-	int          largura;   
-	int          altura;          
-	char         *texto;          
-	guint32      cor;             
-	guint32      textcor;         
-	guint32      bcor;            
-	gboolean     (*func)(Tool *, cairo_t *, gpointer);
+	Tool    *Ob;
+	Tool     *fixed;
+	int          x;
+	int          y;
+	int          largura;
+	int          altura;
+	char         *texto;
+	guint32      cor;
+	guint32      textcor;
+	guint32      bcor;
+	ButtonCallbackFunc     func;
 	int          bord;
+	int		event;
 	Status       visivel;
 	int          trans;
 	gpointer     dados_adicionais;
@@ -335,11 +340,17 @@ typedef struct {
 	gpointer dados_adicionais;
 } TextView;
 
+void		window_center(Tool *window, int window_width, int window_height);
+void		init_win_position(Tool *window, int x, int y);
+void		event_hook(GtkWidget *widget, int event, SignalCallback callback, Pont data);
+
+String		get_EText(GtkWidget *entry);
+void		set_EText(GtkWidget *entry, char *str);
 
 char		*get_uni_name(char *nome);
 void		init_butoon(Butoon *btl);
 void		init_label(Label *lbl);
-void		init_entry(Edtext *ent);
+void		init_EText(Edtext *ent);
 void		init_imagem(Imagem *img);
 void		init_drawing_area(DrawingArea *da);
 void		init_separator(Separator *sep);
@@ -348,6 +359,7 @@ void		init_status_bar(StatusBar *sb);
 void		init_file_chooser(FileChooser *fc);
 void		init_radio_button(RadioButton *rb);
 void		init_text_view(TextView *tv);
+void		criar_grade_locali(GtkFixed *fixed, int larg, int altur);
 
 /*	database sharepreferense	*/
 void		create_directory(const char *path);
@@ -370,13 +382,14 @@ void		listar_registros(const char *db_name, const char *arquivo);
 void		set_size(Tool *widget, int width, int height);
 void		on_item(GtkListBox *listbox, GtkListBoxRow *row, gpointer user_data);
 
-void init_linear_view(LinearView *lv);
-Tool	*add_fixed_layout_to_window(Tool *window);
+void	init_linear_view(LinearView *lv);
+Tool	*create_window_p(const char *title, int width, int height, gboolean resizable);
+Tool	*fixed_layout_window(Tool *window);
 Tool	*create_context_menu(Tool *widget, GCallback callback, gpointer data);
 Tool	*create_window_s(const char *title, int width, int height);
-Tool	*add_button(Tool *container, const char *label, int x, int y, GCallback callback);
+Tool	*add_button(Tool *fixed, const char *button_text, int x, int y, BCall callback, Pont data);
 Tool	*add_label(Tool *container, const char *text, int x, int y);
-Tool	*add_entry(Tool *container, int x, int y, GCallback callback);
+Tool	*add_EText(Tool *container, int x, int y, int event, ECall callback, Pont data);
 Tool	*add_color_chooser(Tool *container, int x, int y, GCallback callback);
 Tool	*add_drawing_area(Tool *container, int x, int y,
 				int width, int height, GCallback draw_callback);
@@ -428,11 +441,16 @@ Tool	*new_window(const char *title, int width, int height);
 GtkFixed	*initialize_layout(Tool *window);
 Tool* create_window(const char *title, int width, int height, gboolean resizable);
 
+char	*if_event(int event);
+int	appl_run(Appl *app, int argc, char **argv);
+void	appl_activate(Appl *app, GCallback activate_callback, Pont user_data);
+Appl	*appl_new(const char *app_id);
 
+void		center_img(GtkFixed *fixed, const char *image, int window_w, int window_h, int r);
 void		set_window_background(Tool *window, guint color_hex);
 void		init_butoon(Butoon *btl);
 void		loop(gpointer user_data);
-void		hook(Tool *widget, const gchar *event_name, GCallback callback, gpointer user_data);
+void		hook(Tool *widget, int event, GCallback callback, gpointer user_data);
 void		set_background_color(Tool *widget, const gchar *color);
 void		hide_widget(Tool *widget);
 void		show_widget(Tool *widget);
@@ -449,12 +467,12 @@ void		apply_css(Tool *widget, const char *css);
 void		set_button_color(Tool *button, const char *color);
 void		set_label_color(Tool *label, const char *color);
 void		set_entry_border_color(Tool *entry, const char *color);
-void		create_image(GtkFixed *fixed, const char *file_path, gint x, gint y);
-void		create_entry(GtkFixed *fixed, gint x, gint y);
+Tool*		create_image(GtkFixed *fixed, const char *file_path, gint x, gint y);
+Tool*		create_entry(GtkFixed *fixed, gint x, gint y);
 void		add_tabs(Tool *notebook, Tool **pages, const char **titles, int count);
-void		create_text(GtkFixed *fixed, const char *text, gint x, gint y);
-void		create_button(GtkFixed *fixed, const char *label, gint x,
-			gint y, void (*callback)(Tool *, gpointer), gpointer user_data);
+Tool*		create_text(GtkFixed *fixed, const char *text, gint x, gint y);
+Tool*		create_button(GtkFixed *fixed, const char *label, gint x, gint y,
+		void (*callback)(Tool *, gpointer), gpointer user_data);
 void		show_notification(Tool *parent, const char *title, const char *message);
 void		set_mouse_event_handler(Tool *widget,
 			void (*handler)(GdkEventButton *, gpointer), gpointer user_data);
@@ -479,6 +497,7 @@ GtkToolItem	*create_toolbar_button(Tool *toolbar, const char *icon_name,
 Tool	*add_widget_at_position(Tool *fixed_container, Tool *widget, int x, int y);
 Tool	*create_color_chooser_with_position(Tool *container, int x, int y,
 				int width, int height, GdkRGBA *color);
+void	sf_icon(GtkApplication *app, const char *icon_path);
 
 #endif // LIBSF_H
 

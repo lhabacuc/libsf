@@ -8,7 +8,9 @@ LIB_NAME = libsf.a
 OBSJ = lib_sf.c \
 	libsf_db.c \
 	libmap.c \
-	libsf_init.c 
+	libsf_init.c \
+	libsf_creat.c \
+	libsf_bin.c
 
 SRC = $(OBSJ)
 OBJ = $(SRC:.c=.o)

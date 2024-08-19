@@ -186,11 +186,11 @@ void desenhar_objeto(Objeto *objeto, cairo_t *cr)
 }
 
 // Função para alterar o tamanho de um widget
-void set_size(Tool *widget, int width, int height)
+/*void set_size(Tool *widget, int width, int height)
 {
     if (GTK_IS_WIDGET(widget))
         gtk_widget_set_size_request(widget, width, height);
-}
+}*/
 
 
 static gboolean on_key_event(Tool *widget, GdkEventKey *event, gpointer data)
@@ -272,10 +272,14 @@ void show_widget(Tool *widget)
 }
 
 // Função genérica para conectar um callback a um evento de um widget
-void hook(Tool *widget, const gchar *event_name, GCallback callback, gpointer user_data)
+void hook(Tool *widget, int event, GCallback callback, gpointer user_data)
 {
-	if (GTK_IS_WIDGET(widget) && event_name != NULL && callback != NULL)
-		g_signal_connect(widget, event_name, callback, user_data);
+	if (GTK_IS_WIDGET(widget) != NULL && callback != NULL)
+	{
+		const char *event_name = if_event(event);
+		if (event_name)
+			g_signal_connect(widget, event_name, callback, user_data);
+	}
 }
 
 static void initialize_app(gpointer user_data)
@@ -322,3 +326,34 @@ void	init_windows(t_window_manager *wm)
 	gtk_window_set_title(GTK_WINDOW(wm->preview_window), "Preview");
 }
 
+Appl	*appl_new(const char *app_id)
+{
+	Appl *app;
+
+	app = gtk_application_new(app_id, G_APPLICATION_REPLACE);
+	if (app == NULL)
+	{
+		// erros apll aqui
+		return (NULL);
+	}
+	return (app);
+}
+
+void	appl_activate(Appl *app, GCallback activate_callback, Pont user_data)
+{
+	if (app != NULL)
+		g_signal_connect(app, "activate", G_CALLBACK(activate_callback), user_data);
+}
+
+int	appl_run(Appl *app, int argc, char **argv)
+{
+	int status;
+
+	if (app != NULL)
+	{
+		status = g_application_run(G_APPLICATION(app), argc, argv);
+		g_object_unref(app);
+		return (status);
+	}
+	return (-1);
+}

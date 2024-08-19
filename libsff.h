@@ -13,9 +13,12 @@
 # define Tool GtkWidget
 # define F(o) G_CALLBACK(o)
 # define Sbox GtkListBox
+# define Pont gpointer
 # define BoxRow GtkListBoxRow
 # define String char*
 # define Vtor int*
+# define Appl GtkApplication
+# define	sf_init(argc, argv) gtk_init(&(argc), &(argv))
 
 // Macros para eventos de mouse
 # define BUTTON_PRESS_EVENT "button-press-event"
@@ -127,8 +130,18 @@
     } while (0)
 
 
-#define sf_printf(fmt, ...) g_print(fmt, ##__VA_ARGS__)
+#define	sf_printf(fmt, ...) g_print(fmt, ##__VA_ARGS__)
 
+#define sf_show(window) \
+    do { \
+        gtk_widget_show_all(window); \
+        gtk_main(); \
+    } while (0)
+
+
+typedef void (*BCall)(GtkWidget *button, Pont data);
+typedef void (*ECall)(GtkWidget *Etext, Pont data);
+typedef void (*SignalCallback)(GtkWidget *, Pont);
 
 typedef struct s_keyvalue
 {
@@ -142,5 +155,6 @@ typedef struct s_map
 	t_keyvalue	*buckets[MAP_SIZE];
 }	t_map;
 
+/*	Funções renomeadas	*/
 
 #endif 

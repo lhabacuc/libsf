@@ -6,6 +6,27 @@
  * @param window A janela GTK na qual a cor de fundo deve ser definida.
  * @param color_hex O valor hexadecimal da cor de fundo (por exemplo, 0xRRGGBB).
  */
+
+void	init_win_position(Tool *window, int x, int y)
+{
+	gtk_window_move((GtkWindow*)window, x, y);
+}
+void	window_center(Tool *window, int window_width, int window_height)
+{
+	gint screen_height;
+	gint screen_width;
+	// Obtém a tela do display
+	GdkScreen *screen = gdk_screen_get_default();
+	// Obtém a largura e altura da tela
+	screen_width = (gint)gdk_screen_get_width(screen);
+	screen_height = (gint)gdk_screen_get_height(screen);
+	// Calcula a posição para centralizar a janela
+	gint x = (screen_width - window_width) / 2;
+	gint y = (screen_height - window_height) / 2;
+	// Move a janela para a posição calculada
+	init_win_position(window, x, y);
+}
+
 void	set_window_background(Tool *window, guint color_hex)
 {
 	if (!GTK_IS_WINDOW(window))
@@ -25,6 +46,12 @@ void	set_window_background(Tool *window, guint color_hex)
 	GtkStyleContext *context = gtk_widget_get_style_context(window);
 	gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 	g_object_unref(provider);
+}
+
+void	event_hook(GtkWidget *widget, int event, SignalCallback callback, Pont data)
+{
+	const char *signal_name = if_event(event);
+	g_signal_connect(widget, signal_name, G_CALLBACK(callback), data);
 }
 
 char	*get_uni_name(char *nome)
@@ -73,9 +100,15 @@ void	init_butoon(Butoon *btl)
 	gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(css_provider),
 		GTK_STYLE_PROVIDER_PRIORITY_USER);
 	g_object_unref(css_provider);
+	
 	if (btl->func)
-		g_signal_connect(G_OBJECT(btl->Ob), "clicked", G_CALLBACK(btl->func),
-			btl->dados_adicionais);
+	{
+		const char *signal_name = if_event(btl->event);
+		if (btl->event)
+			g_signal_connect(G_OBJECT(btl->Ob), signal_name,
+			G_CALLBACK(btl->func), btl->dados_adicionais);
+	}
+	
 	if (btl->visivel == VISIVEL)
 		gtk_widget_show(btl->Ob);
 	else if (btl->visivel == INVISIVEL)
@@ -588,7 +621,7 @@ void	init_separator(Separator *sep)
 }
 
 
-void	init_entry(Edtext *ent)
+void	init_EText(Edtext *ent)
 {
 	GtkCssProvider	*css_provider;
 	GtkStyleContext	*context;
@@ -623,8 +656,12 @@ void	init_entry(Edtext *ent)
 	g_object_unref(css_provider);
 
 	if (ent->func)
-		g_signal_connect(G_OBJECT(ent->Ob), "changed", G_CALLBACK(ent->func),
-			ent->dados_adicionais);
+	{
+		const char *signal_name = if_event(ent->event);
+		if (ent->event)
+			g_signal_connect(G_OBJECT(ent->Ob), signal_name,
+			G_CALLBACK(ent->func), ent->dados_adicionais);
+	}
 
 	if (ent->visivel == VISIVEL)
 		gtk_widget_show(ent->Ob);
@@ -836,4 +873,80 @@ void	force_css(GtkWidget *widget)
     GtkStyleContext *context = gtk_widget_get_style_context(widget);
     gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(css_provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
     g_object_unref(css_provider);
+}
+
+void	center_img(GtkFixed *fixed, const char *image, int window_w, int window_h, int r)
+{
+	GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file(image, NULL);
+	if (!pixbuf)
+	{
+		g_printerr("Erro ao carregar a imagem: %s\n", image);
+		return;
+	}
+	int image_width = gdk_pixbuf_get_width(pixbuf);
+	int image_height = gdk_pixbuf_get_height(pixbuf);
+	double scale_x = (double)window_w / image_width;
+	double scale_y = (double)window_h / image_height;
+	double scale = fmin(scale_x, scale_y);
+	int new_width = image_width * scale - r;
+	int new_height = image_height * scale - r;
+
+	GdkPixbuf *scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf,
+	new_width, new_height, GDK_INTERP_BILINEAR);
+	g_object_unref(pixbuf);
+	GtkWidget *imagei = gtk_image_new_from_pixbuf(scaled_pixbuf);
+	g_object_unref(scaled_pixbuf);
+	int x = (window_w - new_width) / 2;
+	int y = (window_h - new_height) / 2;
+	gtk_fixed_put(fixed, imagei, x, y);
+	gtk_widget_show(imagei);
+}
+
+static gboolean	sf_draw_grid(GtkWidget *widget, cairo_t *cr, gpointer data)
+{
+	GtkAllocation allocation;
+	gtk_widget_get_allocation(widget, &allocation);
+	int width = allocation.width;
+	int height = allocation.height;
+
+	// Define o espaçamento entre os pontos da grade
+	int grid_spacing = 50;
+
+	// Define a cor da grade (cinza claro)
+	cairo_set_source_rgb(cr, 1.0, 0.0, 0.0);
+
+	// Desenha a grade
+	for (int x = 0; x < width; x += grid_spacing)
+	{
+		for (int y = 0; y < height; y += grid_spacing)
+		{
+			// Desenha o ponto
+			cairo_arc(cr, x, y, 2, 0, 2 * G_PI);
+			cairo_fill(cr);
+
+			// Define a cor do texto (preto)
+			cairo_set_source_rgb(cr, 0.1, 0.1, 0.1);
+
+			// Cria o texto da coordenada
+			char coords[20];
+			snprintf(coords, sizeof(coords), "(%d, %d)", x, y);
+
+			// Desenha o texto ao lado do ponto
+			cairo_move_to(cr, x + 5, y - 5);
+			cairo_show_text(cr, coords);
+
+			// Retorna para a cor da grade para o próximo ponto
+			cairo_set_source_rgb(cr, 0.0, 0.0, 1.0);
+		}
+	}
+
+	return FALSE;
+}
+
+void	criar_grade_locali(GtkFixed *fixed, int larg, int altur)
+{
+	GtkWidget *drawing_area = gtk_drawing_area_new();
+	gtk_widget_set_size_request(drawing_area, larg, altur);
+	gtk_fixed_put(GTK_FIXED(fixed), drawing_area, 0, 0);
+	g_signal_connect(G_OBJECT(drawing_area), "draw", G_CALLBACK(sf_draw_grid), NULL);
 }

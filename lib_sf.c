@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "libsf.h"
+
 // Function to create a simple window
 Tool*	create_window_s(const char *title, int width, int height)
 {
@@ -20,6 +21,37 @@ Tool*	create_window_s(const char *title, int width, int height)
 	return (window);
 }
 
+Tool*	create_window_p(const char *title, int width, int height, gboolean resizable)
+{
+	Tool *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_window_set_title(GTK_WINDOW(window), title);
+	gtk_window_set_default_size(GTK_WINDOW(window), width, height);
+	gtk_window_set_resizable(GTK_WINDOW(window), resizable);
+	g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+	window_center(window, 880, 580);
+	return (window);
+}
+
+void	sf_icon(GtkApplication *app, const char *icon_path)
+{
+	GdkPixbuf *icon;
+
+	if (app != NULL && icon_path != NULL)
+	{
+		icon = gdk_pixbuf_new_from_file(icon_path, NULL);
+		if (icon != NULL)
+		{
+			GtkWindow *window;
+
+			window = GTK_WINDOW(gtk_application_get_active_window(app));
+			if (window != NULL)
+			{
+				gtk_window_set_icon(window, icon);
+			}
+			g_object_unref(icon);
+		}
+	}
+}
 // Função para criar uma janela com a opção de tamanho fixo ou redimensionável
 Tool*	create_window(const char *title, int width, int height, gboolean resizable)
 {
@@ -33,7 +65,7 @@ Tool*	create_window(const char *title, int width, int height, gboolean resizable
 
 
 // Funcao para criar conteiner fixo
-Tool*	add_fixed_layout_to_window(Tool *window)
+Tool*	fixed_layout_window(Tool *window)
 {
 	Tool *fixed = gtk_fixed_new();
 	gtk_container_add(GTK_CONTAINER(window), fixed);
@@ -41,11 +73,14 @@ Tool*	add_fixed_layout_to_window(Tool *window)
 }
 
 // Function to add a button to a container
-Tool*	add_button(Tool *container, const char *label, int x, int y, GCallback callback)
+Tool*	add_button(Tool *fixed, const char *button_text, int x, int y, BCall callback, Pont data)
 {
-	Tool *button = gtk_button_new_with_label(label);
-	gtk_fixed_put(GTK_FIXED(container), button, x, y);
-	g_signal_connect(button, "clicked", callback, NULL);
+	GtkWidget *button = gtk_button_new_with_label(button_text);
+	gtk_fixed_put(GTK_FIXED(fixed), button, x, y);
+	gtk_widget_set_size_request(button, 100, 30);
+	if (callback)
+		g_signal_connect(button, "clicked", G_CALLBACK(callback), data);
+	gtk_widget_show(button);
 	return (button);
 }
 
@@ -58,12 +93,151 @@ Tool*	add_label(Tool *container, const char *text, int x, int y)
 }
 
 // Function to add an entry widget to a container
-Tool*	add_entry(Tool *container, int x, int y, GCallback callback)
+char	*if_event(int event)
+{
+	if (event == 1)
+		return ("changed");
+	else if (event == 2)
+		return ("focus-in-event");
+	else if (event == 3)
+		return ("focus-out-event");
+	else if (event == 4)
+		return ("button-press-event");
+	else if (event == 5)
+		return ("button-release-event");
+	else if (event == 6)
+		return ("key-press-event");
+	else if (event == 7)
+		return ("key-release-event");
+	else if (event == 8)
+		return ("enter-notify-event");
+	else if (event == 9)
+		return ("leave-notify-event");
+	else if (event == 10)
+		return ("motion-notify-event");
+	else if (event == 11)
+		return ("delete-event");
+	else if (event == 12)
+		return ("destroy-event");
+	else if (event == 13)
+		return ("expose-event");
+	else if (event == 14)
+		return ("map-event");
+	else if (event == 15)
+		return ("unmap-event");
+	else if (event == 16)
+		return ("property-notify-event");
+	else if (event == 17)
+		return ("selection-clear-event");
+	else if (event == 18)
+		return ("selection-request-event");
+	else if (event == 19)
+		return ("selection-notify-event");
+	else if (event == 20)
+		return ("proximity-in-event");
+	else if (event == 21)
+		return ("proximity-out-event");
+	else if (event == 22)
+		return ("scroll-event");
+	else if (event == 23)
+		return ("visibility-notify-event");
+	else if (event == 24)
+		return ("window-state-event");
+	else if (event == 25)
+		return ("configure-event");
+	else if (event == 26)
+		return ("grab-broken-event");
+	else if (event == 27)
+		return ("drag-begin-event");
+	else if (event == 28)
+		return ("drag-end-event");
+	else if (event == 29)
+		return ("drag-motion-event");
+	else if (event == 30)
+		return ("drag-drop-event");
+	else if (event == 31)
+		return ("drag-leave-event");
+	else if (event == 32)
+		return ("drag-data-received-event");
+	else if (event == 33)
+		return ("drag-data-delete-event");
+	else if (event == 34)
+		return ("drag-failed-event");
+	else if (event == 35)
+		return ("client-event");
+	else if (event == 36)
+		return ("selection-toggled-event");
+	else if (event == 37)
+		return ("scroll-child-event");
+	else if (event == 38)
+		return ("touch-event");
+	else if (event == 39)
+		return ("touch-begin-event");
+	else if (event == 40)
+		return ("touch-update-event");
+	else if (event == 41)
+		return ("touch-end-event");
+	else if (event == 42)
+		return ("touch-cancel-event");
+	else if (event == 43)
+		return ("screen-changed-event");
+	else if (event == 44)
+		return ("size-allocate-event");
+	else if (event == 45)
+		return ("state-changed-event");
+	else if (event == 46)
+		return ("keymap-changed-event");
+	else if (event == 47)
+		return ("popup-menu-event");
+	else if (event == 48)
+		return ("panning-event");
+	else if (event == 49)
+		return ("draw-event");
+	else if (event == 50)
+		return ("button-drag-event");
+	else if (event == 51)
+		return ("clicked");
+	else if (event == 52)
+		return "double-clicked";
+	else if (event == 53)
+		return "right-clicked";
+	else if (event == 54)
+		return "middle-clicked";
+	else if (event == 55)
+		return "hovered";
+	else if (event == 56)
+		return "pressed";
+	else if (event == 57)
+		return "released";
+	else if (event == 58)
+		return "dragged";
+	else if (event == 59)
+		return "focused";
+	else if (event == 60)
+		return "blurred";
+	return ("activate");
+}
+
+
+
+Tool*	add_EText(Tool *container, int x, int y, int event, ECall callback, Pont data)
 {
 	Tool *entry = gtk_entry_new();
 	gtk_fixed_put(GTK_FIXED(container), entry, x, y);
-	g_signal_connect(entry, "changed", callback, NULL);
+	const char *signal_name = if_event(event);
+	if (signal_name)
+		g_signal_connect(entry, signal_name, G_CALLBACK(callback), data);
+
 	return (entry);
+}
+
+void	set_EText(GtkWidget *entry, char *str)
+{
+	gtk_entry_set_text(GTK_ENTRY(entry), str);
+}
+String	get_EText(GtkWidget *entry)
+{
+	return ((String)gtk_entry_get_text(GTK_ENTRY(entry)));
 }
 
 // Function to add a color chooser to a container
@@ -126,7 +300,7 @@ Tool	*add_volume_slider(Tool *container, int x, int y, GCallback callback)
 {
 	Tool *scale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 0, 100, 1);
 	gtk_fixed_put(GTK_FIXED(container), scale, x, y);
-	g_signal_connect(scale, "value-changed", callback, NULL);
+	g_signal_connect(scale, "value-changed", F(callback), NULL);
 	return scale;
 }
 
@@ -135,7 +309,7 @@ Tool	*add_checkbox(Tool *container, const char *label, int x, int y, GCallback c
 {
 	Tool *checkbox = gtk_check_button_new_with_label(label);
 	gtk_fixed_put(GTK_FIXED(container), checkbox, x, y);
-	g_signal_connect(checkbox, "toggled", callback, NULL);
+	g_signal_connect(checkbox, "toggled", F(callback), NULL);
 	return (checkbox);
 }
 
@@ -451,33 +625,37 @@ GtkFixed* initialize_layout(Tool *window)
 }
 
 // Function to create an image
-void	create_image(GtkFixed *fixed, const char *file_path, gint x, gint y)
+Tool*	create_image(GtkFixed *fixed, const char *file_path, gint x, gint y)
 {
 	Tool *image = gtk_image_new_from_file(file_path);
 	gtk_fixed_put(fixed, image, x, y);
+	return (image);
 }
 
 // Function to create an entry
-void	create_entry(GtkFixed *fixed, gint x, gint y)
+Tool*	create_entry(GtkFixed *fixed, gint x, gint y)
 {
 	Tool *entry = gtk_entry_new();
 	gtk_fixed_put(fixed, entry, x, y);
+	return (entry);
 }
 
 // Function to create text
-void	create_text(GtkFixed *fixed, const char *text, gint x, gint y)
+Tool*	create_text(GtkFixed *fixed, const char *text, gint x, gint y)
 {
 	Tool *label = gtk_label_new(text);
 	gtk_fixed_put(fixed, label, x, y);
+	return (label);
 }
 
 // Function to create a button
-void	create_button(GtkFixed *fixed, const char *label, gint x, gint y,
+Tool*	create_button(GtkFixed *fixed, const char *label, gint x, gint y,
 		void (*callback)(Tool *, gpointer), gpointer user_data)
 {
 	Tool *button = gtk_button_new_with_label(label);
 	gtk_fixed_put(fixed, button, x, y);
 	g_signal_connect(button, "clicked", G_CALLBACK(callback), user_data);
+	return (button);
 }
 
 // Function to show a notification
@@ -1253,6 +1431,7 @@ Tool	*create_scale_button(GtkIconSize size, double min, double max, double step)
     return dropdown;
 }
 */
+
 // Function to create a collapsible list
 Tool	*create_collapsible_list(Tool *container)
 {

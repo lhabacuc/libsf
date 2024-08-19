@@ -69,7 +69,7 @@ Estrutura para associar um manipulador de eventos de loop e dados de usuário.
 
 ## Funções
 
-# Criação de Janelas e Layouts
+### Criação de Janelas e Layouts
 
 - **`GtkWidget *create_window_s(const char *title, int width, int height);`**
   - Cria uma janela com o título especificado e dimensões dadas.
@@ -77,7 +77,7 @@ Estrutura para associar um manipulador de eventos de loop e dados de usuário.
 - **`GtkWidget *add_fixed_layout_to_window(GtkWidget *window);`**
   - Adiciona um layout fixo à janela especificada.
 
-# Adicionando Widgets
+### Adicionando Widgets
 
 - **`GtkWidget *add_button(GtkWidget *container, const char *label, int x, int y, GCallback callback);`**
   - Adiciona um botão ao contêiner especificado na posição `(x, y)` com um rótulo e um callback.
@@ -136,7 +136,7 @@ Estrutura para associar um manipulador de eventos de loop e dados de usuário.
 - **`GtkWidget *add_text_view(GtkWidget *container, int x, int y, int width, int height);`**
   - Adiciona uma área de texto ao contêiner com dimensões especificadas.
 
-# Criação de Widgets com Posição
+### Criação de Widgets com Posição
 
 - **`GtkWidget *create_image_with_position(GtkWidget *container, const char *file_path, int x, int y, int width, int height);`**
   - Cria uma imagem com posição e dimensões especificadas.
@@ -156,7 +156,7 @@ Estrutura para associar um manipulador de eventos de loop e dados de usuário.
 - **`GtkWidget *create_button_with_position(GtkWidget *container, const char *label, int x, int y, void (*callback)(GtkWidget *, gpointer), gpointer data);`**
   - Cria um botão com posição e callback especificados.
 
-# Criação de Widgets
+### Criação de Widgets
 
 - **`GtkWidget *create_check_button(const char *label, gboolean initial_state);`**
   - Cria um botão de verificação com um estado inicial.
@@ -194,7 +194,7 @@ Estrutura para associar um manipulador de eventos de loop e dados de usuário.
 - **`GtkWidget *create_text_view(GtkWidget *container);`**
   - Cria uma área de texto.
 
-# Manipulação de Eventos
+### Manipulação de Eventos
 
 -
 
@@ -249,7 +249,7 @@ Estrutura para associar um manipulador de eventos de loop e dados de usuário.
 - **`void set_loop_event_handler(guint interval, void (*handler)(gpointer), gpointer user_data);`**
   - Define um manipulador de eventos de loop com intervalo especificado.
 
-# Criação de Menus e Outros
+### Criação de Menus e Outros
 
 - **`GtkWidget *create_image_c(GtkWidget *container, const char *file_path);`**
   - Cria uma imagem em um contêiner.
@@ -331,7 +331,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-# Evento de Teclado
+##Evento de Teclado
 
 #include "libsf.h"
 
@@ -365,7 +365,7 @@ int main(int argc, char *argv[])
 	return (0);
 }
 
-# Evento de Loop
+##Evento de Loop
 
 #include "libsf.h"
 
