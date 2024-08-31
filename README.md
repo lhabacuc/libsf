@@ -385,15 +385,15 @@ gboolean	on_loop(gpointer user_data)
 int	main(int argc, char *argv[])
 {
 	gtk_init(&argc, &argv);
-
+	
 	GtkWidget *window = create_window_s("Evento de Loop", 400, 300);
-
+	
 	// Configurando o manipulador de eventos de loop
 	g_timeout_add(1000, on_loop, NULL);  // Executa a cada 1000ms (1 segundo)
-
+	
 	gtk_widget_show_all(window);
 	gtk_main();
-
+	
 	return (0);
 }
 ```
