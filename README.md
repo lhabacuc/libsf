@@ -13,57 +13,61 @@
 
 ### `t_root`
 ```c
-typedef struct s_root {
-    GtkWidget *window;
-    GtkWidget *fixed;
-    GtkWidget *item;
-    int x;
-    int y;
-    int th;
-} t_root;
+typedef struct s_root
+{
+	GtkWidget *window;
+	GtkWidget *fixed;
+	GtkWidget *item;
+	int x;
+	int y;
+	int th;
+}	t_root;
 ```
 ```c
 typedef struct s_window_manager
 {
-    GtkWidget *main_window;         // Janela principal
-    GtkWidget *settings_window;     // Janela de configurações
-    GtkWidget *content_window;      // Janela de conteúdo
-    GtkWidget *dialog_window;       // Janela de diálogo
-    GtkWidget *tools_window;        // Janela de ferramentas
-    GtkWidget *help_window;         // Janela de ajuda
-    GtkWidget *temp_window;         // Janela temporária
-    GtkWidget *fixed_layout_window; // Janela com layout fixo
-    GtkWidget *grid_layout_window;  // Janela com layout em grid
-    GtkWidget *data_window;         // Janela com dados
-    GtkWidget *preview_window;      // Janela de visualização
-}   t_window_manager;
+	GtkWidget *main_window;         // Janela principal
+	GtkWidget *settings_window;     // Janela de configurações
+	GtkWidget *content_window;      // Janela de conteúdo
+	GtkWidget *dialog_window;       // Janela de diálogo
+	GtkWidget *tools_window;        // Janela de ferramentas
+	GtkWidget *help_window;         // Janela de ajuda
+	GtkWidget *temp_window;         // Janela temporária
+	GtkWidget *fixed_layout_window; // Janela com layout fixo
+	GtkWidget *grid_layout_window;  // Janela com layout em grid
+	GtkWidget *data_window;         // Janela com dados
+	GtkWidget *preview_window;      // Janela de visualização
+}	t_window_manager;
 ``
 Esta estrutura é usada para armazenar referências a widgets GTK e posições no layout fixo.
 
 ### `t_key_event_data`
 ```c
-typedef struct {
-    void (*key_handler)(GdkEventKey *event, gpointer user_data);
-    gpointer user_data;
-} t_key_event_data;
+typedef struct
+{
+	void (*key_handler)(GdkEventKey *event, gpointer user_data);
+	gpointer user_data;
+}	t_key_event_data;
 ```
 Estrutura para associar um manipulador de eventos de teclado e dados de usuário.
 
 ### `t_mouse_event_data`
 ```c
-typedef struct {
-    void (*mouse_handler)(GdkEventButton *event, gpointer user_data);
-    gpointer user_data;
-} t_mouse_event_data;
+typedef struct
+{
+	void (*mouse_handler)(GdkEventButton *event, gpointer user_data);
+	gpointer user_data;
+}	t_mouse_event_data;
 ```
 Estrutura para associar um manipulador de eventos de mouse e dados de usuário.
 
 ### `t_loop_event_data`
 ```c
-typedef struct {
-    void (*loop_handler)(gpointer user_data);
-    gpointer user_data;
-} t_loop_event_data;
+typedef struct
+{
+	void (*loop_handler)(gpointer user_data);
+	gpointer user_data;
+}	t_loop_event_data;
 ```
 Estrutura para associar um manipulador de eventos de loop e dados de usuário.
 
@@ -308,13 +312,14 @@ Espero que esse manual tenha ajudado a esclarecer o uso de cada função e estru
 #include "libsf.h"
 
 // Função de callback para eventos de mouse
-void on_mouse_click(GdkEventButton *event, gpointer user_data) {
-    if (event->type == GDK_BUTTON_PRESS) {
-        g_print("Botão do mouse clicado em (%f, %f)\n", event->x, event->y);
-    }
+void on_mouse_click(GdkEventButton *event, gpointer user_data)
+{
+	if (event->type == GDK_BUTTON_PRESS)
+		g_print("Botão do mouse clicado em (%f, %f)\n", event->x, event->y);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     gtk_init(&argc, &argv);
 
     GtkWidget *window = create_window_s("Evento de Mouse", 400, 300);
@@ -328,7 +333,7 @@ int main(int argc, char *argv[]) {
     gtk_widget_show_all(window);
     loop_window(window);
 
-    return 0;
+    return (0);
 }
 ```
 # Evento de Teclado
@@ -447,81 +452,85 @@ int main(int argc, char *argv[])
 #  seleção de cor
 ```c
 // Função de callback para seleção de cor
-void on_color_activated(GtkColorChooser *chooser, gpointer user_data) {
-    GdkRGBA color;
-    gtk_color_chooser_get_rgba(chooser, &color);
-    g_print("Cor selecionada: rgba(%f, %f, %f, %f)\n", color.red, color.green, color.blue, color.alpha);
+void	on_color_activated(GtkColorChooser *chooser, gpointer user_data)
+{
+	GdkRGBA color;
+	gtk_color_chooser_get_rgba(chooser, &color);
+	g_print("Cor selecionada: rgba(%f, %f, %f, %f)\n", color.red, color.green, color.blue, color.alpha);
 }
 
-int main(int argc, char *argv[]) {
-    gtk_init(&argc, &argv);
-
-    GtkWidget *window = create_window_s("Evento de Seleção de Cor", 400, 300);
-    GtkWidget *fixed = add_fixed_layout_to_window(window);
-
-    GtkWidget *color_chooser = create_color_chooser(fixed, G_CALLBACK(on_color_activated), NULL);
-
-    gtk_widget_show_all(window);
-    gtk_main();
-
-    return 0;
+int	main(int argc, char *argv[])
+{
+	gtk_init(&argc, &argv);
+	
+	GtkWidget *window = create_window_s("Evento de Seleção de Cor", 400, 300);
+	GtkWidget *fixed = add_fixed_layout_to_window(window);
+	
+	GtkWidget *color_chooser = create_color_chooser(fixed, G_CALLBACK(on_color_activated), NULL);
+	
+	gtk_widget_show_all(window);
+	gtk_main();
+	
+	return (0);
 }
 
 #include "libsf.h"
 
 // Função de callback para eventos de rolagem
-gboolean on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data) {
-    if (event->direction == GDK_SCROLL_UP) {
-        g_print("Rolagem para cima\n");
-    } else if (event->direction == GDK_SCROLL_DOWN) {
-        g_print("Rolagem para baixo\n");
-    }
-    return FALSE;
+gboolean on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
+{
+	if (event->direction == GDK_SCROLL_UP)
+		g_print("Rolagem para cima\n");
+	else if (event->direction == GDK_SCROLL_DOWN)
+		g_print("Rolagem para baixo\n");
+	return (FALSE);
 }
 
-int main(int argc, char *argv[]) {
-    gtk_init(&argc, &argv);
-
-    GtkWidget *window = create_window_s("Evento de Scroll", 400, 300);
-    GtkWidget *fixed = add_fixed_layout_to_window(window);
-
-    GtkWidget *label = add_label(fixed, "Use o scroll do mouse aqui", 50, 50);
-
-    // Configurando o manipulador de eventos de rolagem
-    g_signal_connect(window, "scroll-event", G_CALLBACK(on_scroll), NULL);
-    gtk_widget_set_events(window, GDK_SCROLL_MASK);
-
-    gtk_widget_show_all(window);
-    gtk_main();
-
-    return 0;
+int main(int argc, char *argv[])
+{
+	gtk_init(&argc, &argv);
+	
+	GtkWidget *window = create_window_s("Evento de Scroll", 400, 300);
+	GtkWidget *fixed = add_fixed_layout_to_window(window);
+	
+	GtkWidget *label = add_label(fixed, "Use o scroll do mouse aqui", 50, 50);
+	
+	// Configurando o manipulador de eventos de rolagem
+	g_signal_connect(window, "scroll-event", G_CALLBACK(on_scroll), NULL);
+	gtk_widget_set_events(window, GDK_SCROLL_MASK);
+	
+	gtk_widget_show_all(window);
+	gtk_main();
+	
+	return (0);
 }
 
 
 #include "libsf.h"
 
 // Função de callback para os botões da barra de ferramentas
-void on_toolbar_button_clicked(GtkWidget *widget, gpointer user_data) {
-    g_print("Botão da barra de ferramentas clicado\n");
+void on_toolbar_button_clicked(GtkWidget *widget, gpointer user_data)
+{
+	g_print("Botão da barra de ferramentas clicado\n");
 }
 
-int main(int argc, char *argv[]) {
-    gtk_init(&argc, &argv);
-
-    GtkWidget *window = create_window_s("Toolbar", 400, 300);
-    GtkWidget *fixed = add_fixed_layout_to_window(window);
-
-    GtkWidget *toolbar = create_toolbar(fixed);
-
-    const char *button_labels[] = {"Botão 1", "Botão 2", "Botão 3"};
-    for (int i = 0; i < 3; i++) {
-        create_toolbar_button(toolbar, "icon_name", button_labels[i], G_CALLBACK(on_toolbar_button_clicked), NULL);
-    }
-
-    gtk_widget_show_all(window);
-    gtk_main();
-
-    return 0;
+int main(int argc, char *argv[])
+{
+	gtk_init(&argc, &argv);
+	
+	GtkWidget *window = create_window_s("Toolbar", 400, 300);
+	GtkWidget *fixed = add_fixed_layout_to_window(window);
+	
+	GtkWidget *toolbar = create_toolbar(fixed);
+	
+	const char *button_labels[] = {"Botão 1", "Botão 2", "Botão 3"};
+	for (int i = 0; i < 3; i++)
+	create_toolbar_button(toolbar, "icon_name", button_labels[i], G_CALLBACK(on_toolbar_button_clicked), NULL);
+	
+	gtk_widget_show_all(window);
+	gtk_main();
+	
+	return (0);
 }
 ```
 
