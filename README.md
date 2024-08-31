@@ -304,7 +304,7 @@ Espero que esse manual tenha ajudado a esclarecer o uso de cada função e estru
 
 
 ##Exemplo de Manipulação de Eventos
-
+```c
 #include "libsf.h"
 
 // Função de callback para eventos de mouse
@@ -330,9 +330,9 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
-
+```
 ##Evento de Teclado
-
+```c
 #include "libsf.h"
 
 // Função de callback para eventos de teclado
@@ -364,9 +364,9 @@ int main(int argc, char *argv[])
 	gtk_main();
 	return (0);
 }
-
+```
 ##Evento de Loop
-
+ ```c
 #include "libsf.h"
 
 // Função de callback para evento de loop
@@ -391,8 +391,9 @@ int	main(int argc, char *argv[])
 
 	return (0);
 }
-
+```
 # edittext
+```c
 #include "libsf.h"
 
 // Função de callback para alteração do texto da entrada
@@ -415,8 +416,9 @@ int main(int argc, char *argv[])
 	gtk_main();
 	return (0);
 }
-
+```
 # button 
+```c
 #include "libsf.h"
 
 // Função de callback para um botão
@@ -441,8 +443,9 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
-
+```
 #  seleção de cor
+```c
 // Função de callback para seleção de cor
 void on_color_activated(GtkColorChooser *chooser, gpointer user_data) {
     GdkRGBA color;
@@ -520,7 +523,7 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
-
+```
 
 
 # compilar cc ou gcc
