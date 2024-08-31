@@ -312,28 +312,28 @@ Espero que esse manual tenha ajudado a esclarecer o uso de cada função e estru
 #include "libsf.h"
 
 // Função de callback para eventos de mouse
-void on_mouse_click(GdkEventButton *event, gpointer user_data)
+void	on_mouse_click(GdkEventButton *event, gpointer user_data)
 {
 	if (event->type == GDK_BUTTON_PRESS)
 		g_print("Botão do mouse clicado em (%f, %f)\n", event->x, event->y);
 }
 
-int main(int argc, char *argv[])
+int	main(int argc, char *argv[])
 {
-    gtk_init(&argc, &argv);
-
-    GtkWidget *window = create_window_s("Evento de Mouse", 400, 300);
-    GtkWidget *fixed = add_fixed_layout_to_window(window);
-    
-    GtkWidget *button = add_button(fixed, "Clique-me", 100, 100, NULL);
-
-    // Configurando o manipulador de eventos de mouse
-    set_mouse_event_handler(button, on_mouse_click, NULL);
-
-    gtk_widget_show_all(window);
-    loop_window(window);
-
-    return (0);
+	gtk_init(&argc, &argv);
+	
+	GtkWidget *window = create_window_s("Evento de Mouse", 400, 300);
+	GtkWidget *fixed = add_fixed_layout_to_window(window);
+	
+	GtkWidget *button = add_button(fixed, "Clique-me", 100, 100, NULL);
+	
+	// Configurando o manipulador de eventos de mouse
+	set_mouse_event_handler(button, on_mouse_click, NULL);
+	
+	gtk_widget_show_all(window);
+	loop_window(window);
+	
+	return (0);
 }
 ```
 # Evento de Teclado
@@ -341,7 +341,7 @@ int main(int argc, char *argv[])
 #include "libsf.h"
 
 // Função de callback para eventos de teclado
-gboolean on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+gboolean	on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
 	if (event->keyval == GDK_KEY_q)
 	{
@@ -354,7 +354,7 @@ gboolean on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 	return (FALSE);
 }
 
-int main(int argc, char *argv[])
+int	main(int argc, char *argv[])
 {
 	gtk_init(&argc, &argv);
 
@@ -402,13 +402,13 @@ int	main(int argc, char *argv[])
 #include "libsf.h"
 
 // Função de callback para alteração do texto da entrada
-void on_text_entry_changed(GtkWidget *widget, gpointer user_data)
+void	on_text_entry_changed(GtkWidget *widget, gpointer user_data)
 {
 	const char *text = gtk_entry_get_text(GTK_ENTRY(widget));
 	g_print("Texto alterado: %s\n", text);
 }
 
-int main(int argc, char *argv[])
+int	main(int argc, char *argv[])
 {
 	gtk_init(&argc, &argv);
 
@@ -427,12 +427,12 @@ int main(int argc, char *argv[])
 #include "libsf.h"
 
 // Função de callback para um botão
-void on_button_click(GtkWidget *widget, gpointer user_data)
+void	on_button_click(GtkWidget *widget, gpointer user_data)
 {
 	g_print("Botão clicado!\n");
 }
 
-int main(int argc, char *argv[])
+int	main(int argc, char *argv[])
 {
 	gtk_init(&argc, &argv);
 
@@ -477,7 +477,7 @@ int	main(int argc, char *argv[])
 #include "libsf.h"
 
 // Função de callback para eventos de rolagem
-gboolean on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
+gboolean	on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
 {
 	if (event->direction == GDK_SCROLL_UP)
 		g_print("Rolagem para cima\n");
@@ -486,7 +486,7 @@ gboolean on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
 	return (FALSE);
 }
 
-int main(int argc, char *argv[])
+int	main(int argc, char *argv[])
 {
 	gtk_init(&argc, &argv);
 	
@@ -509,12 +509,12 @@ int main(int argc, char *argv[])
 #include "libsf.h"
 
 // Função de callback para os botões da barra de ferramentas
-void on_toolbar_button_clicked(GtkWidget *widget, gpointer user_data)
+void	on_toolbar_button_clicked(GtkWidget *widget, gpointer user_data)
 {
 	g_print("Botão da barra de ferramentas clicado\n");
 }
 
-int main(int argc, char *argv[])
+int	main(int argc, char *argv[])
 {
 	gtk_init(&argc, &argv);
 	
