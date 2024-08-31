@@ -303,7 +303,7 @@ Espero que esse manual tenha ajudado a esclarecer o uso de cada função e estru
 		                                           
 
 
-##Exemplo de Manipulação de Eventos
+# Exemplo de Manipulação de Eventos
 ```c
 #include "libsf.h"
 
@@ -331,7 +331,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 ```
-##Evento de Teclado
+# Evento de Teclado
 ```c
 #include "libsf.h"
 
@@ -365,7 +365,7 @@ int main(int argc, char *argv[])
 	return (0);
 }
 ```
-##Evento de Loop
+# Evento de Loop
  ```c
 #include "libsf.h"
 
