@@ -89,6 +89,50 @@
 		gtk_widget_set_valign(GTK_WIDGET(widget), yalign); \
 	} while (0)
 
+// Definir a cor de fundo de um widget
+#define widget_set_background_color(widget, r, g, b) \
+	do { \
+		GdkRGBA color = {r, g, b, 1.0}; \
+		gtk_widget_override_background_color(GTK_WIDGET(widget), GTK_STATE_FLAG_NORMAL, &color); \
+	} while (0)
+
+// Definir a cor do texto de um widget
+#define widget_set_text_color(widget, r, g, b) \
+	do { \
+		GdkRGBA color = {r, g, b, 1.0}; \
+		gtk_widget_override_color(GTK_WIDGET(widget), GTK_STATE_FLAG_NORMAL, &color); \
+	} while (0)
+
+// Definir a cor da borda de um widget
+#define widget_set_border_color(widget, r, g, b) \
+	do { \
+		GdkRGBA color = {r, g, b, 1.0}; \
+		gtk_widget_override_color(GTK_WIDGET(widget), GTK_STATE_FLAG_NORMAL, &color); \
+		gtk_widget_override_background_color(GTK_WIDGET(widget), GTK_STATE_FLAG_NORMAL, &color); \
+	} while (0)
+
+// Definir a cor do foco (highlight) de um widget
+#define widget_set_focus_color(widget, r, g, b) \
+	do { \
+		GdkRGBA color = {r, g, b, 1.0}; \
+		gtk_widget_override_color(GTK_WIDGET(widget), GTK_STATE_FLAG_FOCUS, &color); \
+	} while (0)
+
+// Definir a cor de um widget em estado ativo (pressed)
+#define widget_set_active_color(widget, r, g, b) \
+	do { \
+		GdkRGBA color = {r, g, b, 1.0}; \
+		gtk_widget_override_color(GTK_WIDGET(widget), GTK_STATE_FLAG_ACTIVE, &color); \
+	} while (0)
+
+// Definir a cor de um widget em estado de desabilitado
+#define widget_set_disabled_color(widget, r, g, b) \
+	do { \
+		GdkRGBA color = {r, g, b, 1.0}; \
+		gtk_widget_override_color(GTK_WIDGET(widget), GTK_STATE_FLAG_INSENSITIVE, &color); \
+	} while (0)
+
+
 typedef struct
 {
 	int	x;          // Posição X do cursor
