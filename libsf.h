@@ -5,12 +5,18 @@
 # include <string.h>
 # include <sys/stat.h>
 # include <math.h>
-# include <cairo.h>
+//# include <cairo.h>
 # include <gtk/gtk.h>
 # include <errno.h>
 # include "libsff.h"
 # include "libsf_run.h"
-//gcc -o app t.c -I./libsf-s -L./libsf-s -lsf `pkg-config --cflags --libs gtk+-3.0`
+# include "libsf_box.h"
+# include "libsf_grid.h"
+# include "libsf_des.h"
+//gcc -o app t.c -I./libsf-s -L./libsf-s -lsf `pkg-config --cflags --libs gtk+-3.0` -lm
+
+#define conectar(widget, evento, funcao, dados) \
+	g_signal_connect(widget, evento, G_CALLBACK(funcao), dados)
 
 // Estrutura para gerenciar diferentes janelas no aplicativo
 typedef struct s_window_manager
@@ -64,8 +70,8 @@ typedef struct s_entry
 {
 	Tool *Ob;            
 	Tool *fixed;         
-	int x;                    
-	int y;                    
+	int x;  
+	int y;
 	int largura;              
 	int altura;               
 	char *texto;              
@@ -231,7 +237,7 @@ typedef struct s_progress_bar {
 	guint32 bcor;      
 	gboolean (*update_callback)(Tool *, gpointer);
 	gpointer update_callback_data;  
-	int bord;                   
+	int bord;
 	Status visivel;             
 	int trans;                
 } ProgressBar;
@@ -340,12 +346,25 @@ typedef struct {
 	gpointer dados_adicionais;
 } TextView;
 
+void	printKey();
+/////
+
+GtkWidget *create_box_horizontal();
+GtkWidget *add_icon_from_file(const char *file_path, int width, int height);
+void	add_to_box(GtkWidget *box, GtkWidget *widget);
+GtkWidget *add_list_box(GtkWidget *parent, int x, int y, int width, int height);
+void	add_to_list_boxx(GtkWidget *list_box, GtkWidget *row);
+void	add_to_custom_list_box(GtkWidget *list_box, GtkWidget *row);
+//////
+void	set_widget_size(Tool *widget, int width, int height);
 void		window_center(Tool *window, int window_width, int window_height);
-void		init_win_position(Tool *window, int x, int y);
+void		 window_position(Tool *window, int x, int y);
 void		event_hook(GtkWidget *widget, int event, SignalCallback callback, Pont data);
 
 String		get_EText(GtkWidget *entry);
 void		set_EText(GtkWidget *entry, char *str);
+
+void	key_hook(GtkWidget *widget, int ive, void (*callback)(GtkWidget *, GdkEventKey *, gpointer), gpointer user_data);
 
 char		*get_uni_name(char *nome);
 void		init_butoon(Butoon *btl);
@@ -429,6 +448,7 @@ Tool	*create_spin_button(double min, double max, double step, double initial_val
 Tool	*create_combo_box(const char **items, int num_items, int default_index);
 Tool	*create_image_ph(Tool *container, const char
 					*file_path, gint x, gint y, gint width, gint height);
+Tool	*size_fixed(Tool *wg, gint width, gint height);
 Tool	*create_vbox(gboolean homogeneous, gint spacing);
 Tool	*create_hbox(gboolean homogeneous, gint spacing);
 Tool	*create_grid(gint row_spacing, gint column_spacing);
@@ -440,6 +460,8 @@ Tool	*create_text_view(Tool *container);
 Tool	*new_window(const char *title, int width, int height);
 GtkFixed	*initialize_layout(Tool *window);
 Tool* create_window(const char *title, int width, int height, gboolean resizable);
+
+void set_position(Tool *widget, GtkFixed *container, int x, int y);
 
 char	*if_event(int event);
 int	appl_run(Appl *app, int argc, char **argv);
@@ -491,6 +513,7 @@ Tool	*create_color_chooser(Tool *container, GCallback callback, gpointer data);
 Tool	*create_notebook(Tool *container);
 void		define_css(GtkWidget *widget);
 Tool	*create_media_viewer(Tool *container);
+Tool	*add_position(Tool *container, Tool *widget, int x, int y);
 Tool	*create_toolbar(Tool *container);
 GtkToolItem	*create_toolbar_button(Tool *toolbar, const char *icon_name,
 				const char *tooltip, GCallback callback, gpointer data);
@@ -498,6 +521,8 @@ Tool	*add_widget_at_position(Tool *fixed_container, Tool *widget, int x, int y);
 Tool	*create_color_chooser_with_position(Tool *container, int x, int y,
 				int width, int height, GdkRGBA *color);
 void	sf_icon(GtkApplication *app, const char *icon_path);
+
+char	get_char(const char *str, int position);
 
 #endif // LIBSF_H
 

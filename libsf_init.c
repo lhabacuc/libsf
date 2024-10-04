@@ -2,12 +2,11 @@
 
 /**
  * Define a cor de fundo da janela.
- * 
- * @param window A janela GTK na qual a cor de fundo deve ser definida.
+ * @param window A janela na qual a cor de fundo deve ser definida.
  * @param color_hex O valor hexadecimal da cor de fundo (por exemplo, 0xRRGGBB).
  */
 
-void	init_win_position(Tool *window, int x, int y)
+void	window_position(Tool *window, int x, int y)
 {
 	gtk_window_move((GtkWindow*)window, x, y);
 }
@@ -24,7 +23,7 @@ void	window_center(Tool *window, int window_width, int window_height)
 	gint x = (screen_width - window_width) / 2;
 	gint y = (screen_height - window_height) / 2;
 	// Move a janela para a posição calculada
-	init_win_position(window, x, y);
+	window_position(window, x, y);
 }
 
 void	set_window_background(Tool *window, guint color_hex)
@@ -143,7 +142,7 @@ void init_imagem(Imagem *img)
        // printf("Imagem atualizada e reposicionada em (%d, %d).\n", img->x, img->y);
     }
 
-    gtk_widget_set_name(img->Ob, get_uni_name("imagem"));
+    gtk_widget_set_name(img->Ob, "imagem");
 
     GtkCssProvider *css_provider = gtk_css_provider_new();
     char css[256];

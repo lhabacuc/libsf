@@ -1,9 +1,17 @@
 #include "libsf.h"
-
+//# define GdkEventKey EventKey
+# define hover "enter-notify-event"
 // Function to create a quick icon
 Tool	*create_quick_icon(const char *icon_name)
 {
 	return (gtk_image_new_from_icon_name(icon_name, GTK_ICON_SIZE_BUTTON));
+}
+
+// Função para configurar um manipulador de eventos genérico
+void sf_hook(GtkWidget *widget, const gchar *event_name,
+                       void (*callback)(GtkWidget *, gpointer), gpointer user_data)
+{
+	g_signal_connect(widget, event_name, G_CALLBACK(callback), user_data);
 }
 
 // Function to create a quick text
@@ -12,14 +20,30 @@ Tool	*create_quick_text(const char *text)
 	return (gtk_label_new(text));
 }
 
-void	set_size(Tool *widget, int width, int height)
+void	set_size(GtkWidget *widget, int width, int height)
 {
 	if (GTK_IS_WIDGET(widget))
-		gtk_widget_set_size_request(GTK_WIDGET(widget), width, height);
-	else
-		g_warning("set_size: O widget fornecido não é um widget sf válido.");
-}
+	{
+		gtk_widget_set_size_request(widget, width, height);
 
+		GtkWidget *parent = gtk_widget_get_parent(widget);
+		while (parent)
+		{
+			if (GTK_IS_BOX(parent))
+			{
+				GtkBox *box = GTK_BOX(parent);
+				gtk_widget_set_size_request(widget, width, height);
+				gtk_box_set_homogeneous(box, FALSE);
+				gtk_box_set_spacing(box, 0);
+				gtk_widget_queue_resize(parent);
+				break ;
+			}
+			parent = gtk_widget_get_parent(parent);
+		}
+	}
+	else
+		g_warning("set_size: O widget fornecido não é um widget GTK válido.");
+}
 // Function to create a quick header
 Tool	*create_quick_header(const char *label)
 {
@@ -83,16 +107,6 @@ Tool	*create_quick_icon_label(const char *icon_name, const char *text)
 	return (box);
 }
 
-// Function to create a quick icon header
-/*Tool *create_quick_icon_header(const char *icon_name, const char *text) {
-    Tool *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    Tool *icon = create_quick_icon(icon_name);
-    Tool *label = create_quick_header(text);
-    gtk_box_pack_start(GTK_BOX(box), icon, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 0);
-    return box;
-}
-*/
 // Function to create a quick icon footer
 Tool	*create_quick_icon_footer(const char *icon_name, const char *text)
 {
@@ -185,28 +199,18 @@ void desenhar_objeto(Objeto *objeto, cairo_t *cr)
         objeto->desenho_callback(objeto->widget, cr, objeto->dados);
 }
 
-// Função para alterar o tamanho de um widget
-/*void set_size(Tool *widget, int width, int height)
-{
-    if (GTK_IS_WIDGET(widget))
-        gtk_widget_set_size_request(widget, width, height);
-}*/
-
-
 static gboolean on_key_event(Tool *widget, GdkEventKey *event, gpointer data)
 {
     t_key_event_data *key_data = (t_key_event_data *)data;
     if (key_data->key_handler)
-    {
         key_data->key_handler(event, key_data->user_data);
-    }
-    return FALSE; // Retorna FALSE para permitir que outros handlers processem o evento
+    return FALSE;
 }
 
 // Função para adicionar um manipulador de eventos de tecla
 void	hook_key(Tool *widget, void (*key_handler)(GdkEventKey *event, gpointer user_data), gpointer user_data)
 {
-    if (GTK_IS_WIDGET(widget) && key_handler != NULL)
+    if (GTK_IS_WIDGET(widget))
     {
         t_key_event_data *key_data = g_malloc(sizeof(t_key_event_data));
         key_data->key_handler = key_handler;
@@ -274,12 +278,9 @@ void show_widget(Tool *widget)
 // Função genérica para conectar um callback a um evento de um widget
 void hook(Tool *widget, int event, GCallback callback, gpointer user_data)
 {
-	if (GTK_IS_WIDGET(widget) != NULL && callback != NULL)
-	{
-		const char *event_name = if_event(event);
-		if (event_name)
-			g_signal_connect(widget, event_name, callback, user_data);
-	}
+	const char *event_name = if_event(event);
+	if (event_name)
+		g_signal_connect(widget, event_name, callback, user_data);
 }
 
 static void initialize_app(gpointer user_data)

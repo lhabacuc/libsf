@@ -7,6 +7,23 @@ char		*get_value(const char *db_name, const char *key, const char *arquivo);
 void		listar_registros(const char *db_name, const char *arquivo);
 void		delete_record(const char *db_name, const char *key, const char *arquivo);
 
+char	get_char(const char *str, int position)
+{
+	if (str == NULL)
+		return '\0';
+	if (position == 0)
+		return (str[0]);
+	else
+	{
+		int	length = 0;
+
+		while (str[length] != '\0')
+		length++;
+		return (str[length - 1]);
+	}
+	return '\0';
+}
+
 void	create_directory(const char *path)
 {
 	struct stat st = {0};

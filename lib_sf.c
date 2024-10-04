@@ -28,7 +28,7 @@ Tool*	create_window_p(const char *title, int width, int height, gboolean resizab
 	gtk_window_set_default_size(GTK_WINDOW(window), width, height);
 	gtk_window_set_resizable(GTK_WINDOW(window), resizable);
 	g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-	window_center(window, 880, 580);
+	window_center(window, width, height);
 	return (window);
 }
 
@@ -42,12 +42,9 @@ void	sf_icon(GtkApplication *app, const char *icon_path)
 		if (icon != NULL)
 		{
 			GtkWindow *window;
-
 			window = GTK_WINDOW(gtk_application_get_active_window(app));
 			if (window != NULL)
-			{
 				gtk_window_set_icon(window, icon);
-			}
 			g_object_unref(icon);
 		}
 	}
@@ -247,6 +244,33 @@ Tool	*add_color_chooser(Tool *container, int x, int y, GCallback callback)
 	gtk_fixed_put(GTK_FIXED(container), color_chooser, x, y);
 	g_signal_connect(color_chooser, "color-set", callback, NULL);
 	return (color_chooser);
+}
+
+void	printKey()
+{
+	printf("\n\
+	typedef struct GdkEventKey\n\
+	{\n\
+		GdkEventType	type;       Tipo de evento (GDK_KEY_PRESS ou GDK_KEY_RELEASE)\n\
+		GdkDisplay	*display;   Exibição onde o evento ocorreu\n\
+		GdkWindow	*window;    A janela que recebeu o evento\n\
+		int	time;               Timestamp do evento\n\
+		int	keyval;             Valor da tecla (por exemplo, GDK_KEY_A)\n\
+		int	state;              Estado das teclas modificadoras (Shift, Ctrl, etc.)\n\
+		int	length;             Comprimento da string de texto\n\
+    ( const )   char	*string;            String representando a tecla pressionada\n\
+		int	hardware_keycode;   Código da tecla de hardware\n\
+		int	group;              Grupo de teclas (para layout de teclado)\n\
+		int	is_modifier;        Se a tecla é um modificador (Shift, Ctrl, etc.)\n\
+	}	GdkEventKey;\n");
+}
+
+void	key_hook(GtkWidget *widget, int ive, void (*callback)(GtkWidget *, GdkEventKey *, gpointer), gpointer user_data)
+{
+	if (ive == 1)
+		g_signal_connect(widget, "key-press-event", G_CALLBACK(callback), user_data);
+	else
+		g_signal_connect(widget, "key-release-event", G_CALLBACK(callback), user_data);
 }
 
 // Function to add a drawing area to a container
@@ -494,11 +518,22 @@ Tool	*create_image_ph(Tool *container,
 	return (image);
 }
 
+Tool	*size_fixed(Tool *wg, gint width, gint height)
+{
+	gtk_widget_set_size_request(wg, width, height);
+	return (wg);
+}
+
+void	set_position(Tool *widget, GtkFixed *container, int x, int y)
+{
+    // Adiciona o widget ao contêiner GtkFixed na posição (x, y)
+    gtk_fixed_put(container, widget, x, y);
+}
 // Function to create a vertical box
-Tool	*create_vbox(gboolean homogeneous, gint spacing)
+/*Tool	*create_vbox(gboolean homogeneous, gint spacing)
 {
 	return (gtk_box_new(GTK_ORIENTATION_VERTICAL, spacing));
-}
+}*/
 
 // Function to create a horizontal box
 Tool	*create_hbox(gboolean homogeneous, gint spacing)
@@ -506,14 +541,6 @@ Tool	*create_hbox(gboolean homogeneous, gint spacing)
 	return (gtk_box_new(GTK_ORIENTATION_HORIZONTAL, spacing));
 }
 
-// Function to create a grid
-Tool	*create_grid(gint row_spacing, gint column_spacing)
-{
-	Tool *grid = gtk_grid_new();
-	gtk_grid_set_row_spacing(GTK_GRID(grid), row_spacing);
-	gtk_grid_set_column_spacing(GTK_GRID(grid), column_spacing);
-	return (grid);
-}
 
 // Function to create a fixed layout
 Tool	*create_fixed_layout(void)
@@ -528,6 +555,7 @@ Tool	*create_entry1(GtkFixed *fixed, gint x, gint y,
 	Tool *entry = gtk_entry_new();
 	gtk_fixed_put(fixed, entry, x, y);
 	g_signal_connect(entry, "activate", G_CALLBACK(callback), NULL);
+	sf_set_name(entry, "entry");
 	// Apply border color (this requires CSS in GTK 3)
 	char css[256];
 	snprintf(css, sizeof(css), "entry { border: 1px solid %s; }", border_color);
@@ -539,6 +567,7 @@ Tool	*create_entry1(GtkFixed *fixed, gint x, gint y,
 Tool	*create_label(Tool *container, const char *text)
 {
 	Tool *label = gtk_label_new(text);
+	sf_set_name(label, "label");
 	gtk_container_add(GTK_CONTAINER(container), label);
 	return (label);
 }
@@ -547,6 +576,7 @@ Tool	*create_label(Tool *container, const char *text)
 Tool	*create_text_view(Tool *container)
 {
 	Tool *text_view = gtk_text_view_new();
+	sf_set_name(text_view, "text");
 	gtk_container_add(GTK_CONTAINER(container), text_view);
 	return (text_view);
 }
@@ -597,6 +627,7 @@ void apply_css(Tool *widget, const char *css)
 void	set_button_color(Tool *button, const char *color)
 {
 	char css[256];
+	sf_set_name(button, "button");
 	snprintf(css, sizeof(css), "button { background-color: %s; }", color);
 	apply_css(button, css);
 }
@@ -605,6 +636,7 @@ void	set_button_color(Tool *button, const char *color)
 void	set_label_color(Tool *label, const char *color)
 {
 	char css[256];
+	sf_set_name(label, "label");
 	snprintf(css, sizeof(css), "label { color: %s; }", color);
 	apply_css(label, css);
 }
@@ -612,6 +644,7 @@ void	set_label_color(Tool *label, const char *color)
 // Function to set entry border color
 void	set_entry_border_color(Tool *entry, const char *color)
 {
+	sf_set_name(entry, "entry");
 	char css[256];
 	snprintf(css, sizeof(css), "entry { border: 1px solid %s; }", color);
 	apply_css(entry, css);
@@ -620,6 +653,7 @@ void	set_entry_border_color(Tool *entry, const char *color)
 GtkFixed* initialize_layout(Tool *window)
 {
     GtkFixed *fixed = GTK_FIXED(gtk_fixed_new());
+    sf_set_name(fixed, "fixed");
     gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(fixed));
     return fixed;
 }
@@ -628,6 +662,7 @@ GtkFixed* initialize_layout(Tool *window)
 Tool*	create_image(GtkFixed *fixed, const char *file_path, gint x, gint y)
 {
 	Tool *image = gtk_image_new_from_file(file_path);
+	sf_set_name(image, "img");
 	gtk_fixed_put(fixed, image, x, y);
 	return (image);
 }
@@ -636,6 +671,7 @@ Tool*	create_image(GtkFixed *fixed, const char *file_path, gint x, gint y)
 Tool*	create_entry(GtkFixed *fixed, gint x, gint y)
 {
 	Tool *entry = gtk_entry_new();
+	sf_set_name(entry, "entry");
 	gtk_fixed_put(fixed, entry, x, y);
 	return (entry);
 }
@@ -644,6 +680,7 @@ Tool*	create_entry(GtkFixed *fixed, gint x, gint y)
 Tool*	create_text(GtkFixed *fixed, const char *text, gint x, gint y)
 {
 	Tool *label = gtk_label_new(text);
+	sf_set_name(label, "label");
 	gtk_fixed_put(fixed, label, x, y);
 	return (label);
 }
@@ -654,6 +691,7 @@ Tool*	create_button(GtkFixed *fixed, const char *label, gint x, gint y,
 {
 	Tool *button = gtk_button_new_with_label(label);
 	gtk_fixed_put(fixed, button, x, y);
+	sf_set_name(button, "button");
 	g_signal_connect(button, "clicked", G_CALLBACK(callback), user_data);
 	return (button);
 }
@@ -702,6 +740,7 @@ void	set_loop_event_handler(guint interval,
 Tool	*create_image_c(Tool *container, const char *file_path)
 {
 	Tool *image = gtk_image_new_from_file(file_path);
+	sf_set_name(image, "img");
 	gtk_container_add(GTK_CONTAINER(container), image);
 	return (image);
 }
@@ -710,6 +749,7 @@ Tool	*create_image_c(Tool *container, const char *file_path)
 Tool	*create_calendar(Tool *container)
 {
 	Tool *calendar = gtk_calendar_new();
+	sf_set_name(calendar, "calendar");
 	gtk_container_add(GTK_CONTAINER(container), calendar);
 	return (calendar);
 }
@@ -730,6 +770,7 @@ Tool	*create_color_chooser(Tool *container,
 {
 	Tool *color_chooser = gtk_color_chooser_widget_new();
 	g_signal_connect(color_chooser, "color-activated", callback, data);
+	sf_set_name(color_chooser, "color_chooser");
 	gtk_container_add(GTK_CONTAINER(container), color_chooser);
 	return (color_chooser);
 }
@@ -738,6 +779,7 @@ Tool	*create_color_chooser(Tool *container,
 Tool	*create_notebook(Tool *container)
 {
 	Tool *notebook = gtk_notebook_new();
+	sf_set_name(notebook, "notebook");
 	gtk_container_add(GTK_CONTAINER(container), notebook);
 	return (notebook);
 }
@@ -766,6 +808,7 @@ void	set_status_bar_message(Tool *status_bar, const char *message)
 Tool	*create_toolbar(Tool *container)
 {
 	Tool *toolbar = gtk_toolbar_new();
+	sf_set_name(toolbar, "toolbar");
 	gtk_container_add(GTK_CONTAINER(container), toolbar);
 	return (toolbar);
 }
@@ -789,12 +832,20 @@ Tool	*add_widget_at_position(Tool *fixed_container,
 	return (widget);
 }
 
+Tool	*add_position(Tool *container, Tool *widget, int x, int y)
+{
+	gtk_fixed_put(GTK_FIXED(container), widget, x, y);
+	return (widget);
+}
+
+
 // Function to create an info dialog
 Tool	*create_info_dialog(GtkWindow *parent,
 				const char *title, const char *message)
 {
 	Tool *dialog = gtk_message_dialog_new(parent, GTK_DIALOG_DESTROY_WITH_PARENT,
 	GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "%s", message);
+	sf_set_name(dialog, "dialog");
 	gtk_window_set_title(GTK_WINDOW(dialog), title);
 	return (dialog);
 }
@@ -804,6 +855,7 @@ Tool	*create_warning_dialog(GtkWindow *parent, const char *title, const char *me
 {
 	Tool *dialog = gtk_message_dialog_new(parent, GTK_DIALOG_DESTROY_WITH_PARENT,
 	GTK_MESSAGE_WARNING, GTK_BUTTONS_OK, "%s", message);
+	sf_set_name(dialog, "dialog");
 	gtk_window_set_title(GTK_WINDOW(dialog), title);
 	return (dialog);
 }
@@ -824,6 +876,7 @@ Tool	*create_file_chooser_dialog(GtkWindow *parent,
 {
 	Tool *dialog = gtk_file_chooser_dialog_new(title, parent, action, "_Cancel",
 	GTK_RESPONSE_CANCEL, "_Open", GTK_RESPONSE_ACCEPT, NULL);
+	sf_set_name(dialog, "dialog");
 	return (dialog);
 }
 
@@ -837,6 +890,7 @@ void	set_widget_size(Tool *widget, int width, int height)
 Tool	*create_menu_item(const char *label, GCallback callback, gpointer data)
 {
 	Tool *menu_item = gtk_menu_item_new_with_label(label);
+	sf_set_name(menu_item, "menu_item");
 	g_signal_connect(menu_item, "activate", callback, data);
 	return (menu_item);
 }
@@ -851,6 +905,7 @@ Tool	*create_menu_bar(void)
 void	add_menu_item(Tool *menu, const char *label, GCallback callback, gpointer data)
 {
 	Tool *menu_item = gtk_menu_item_new_with_label(label);
+	sf_set_name(menu_item, "menu_item");
 	g_signal_connect(menu_item, "activate", callback, data);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
 }
@@ -897,6 +952,7 @@ GtkFileFilter	*create_file_filter(const char *name, const char **patterns)
 Tool	*create_tree_view(GtkListStore *store)
 {
 	Tool *tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+	sf_set_name(tree_view, "tree_view");
 	g_object_unref(store);
 	return (tree_view);
 }
@@ -926,33 +982,17 @@ void	add_column_to_tree_view(Tool *tree_view, const char *title,
 Tool	*create_list_view(GtkListStore *store, GType *types, int n_columns)
 {
 	Tool *list_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+	sf_set_name(list_view, "list_view");
 	g_object_unref(store);
 	for (int i = 0; i < n_columns; i++)
 	{
 		GtkCellRenderer *renderer = create_cell_renderer();
-		GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes("", renderer,
-									"text", i, NULL);
+		GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes("", renderer, "text", i, NULL);
 		gtk_tree_view_append_column(GTK_TREE_VIEW(list_view), column);
 	}
 	return (list_view);
 }
 
-// Function to add a row to a list store
-/*void add_row_to_list_store(GtkListStore *store, ...) {
-    GtkTreeIter iter;
-    va_list args;
-    va_start(args, store);
-    gtk_list_store_append(store, &iter);
-    for (int i = 0; i < G_N_ELEMENTS(store->priv->columns); i++) {
-        GValue value = G_VALUE_INIT;
-        g_value_init(&value, store->priv->columns[i]);
-        g_value_set_string(&value, va_arg(args, char *));
-        gtk_list_store_set_value(store, &iter, i, &value);
-        g_value_unset(&value);
-    }
-    va_end(args);
-}
-*/
 // Function to create a text buffer
 GtkTextBuffer	*create_text_buffer(const char *text)
 {
@@ -987,6 +1027,7 @@ Tool	*create_link_button(const char *uri, const char *label)
 Tool	*create_toggle_button(const char *label, gboolean initial_state)
 {
 	Tool *toggle_button = gtk_toggle_button_new_with_label(label);
+	sf_set_name(toggle_button, "toggle_button");
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_button), initial_state);
 	return (toggle_button);
 }
@@ -995,6 +1036,7 @@ Tool	*create_toggle_button(const char *label, gboolean initial_state)
 Tool	*create_radio_button(Tool *group, const char *label, gboolean active)
 {
 	Tool *radio_button = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(group), label);
+	sf_set_name(radio_button, "radio_button");
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio_button), active);
 	return (radio_button);
 }
@@ -1052,6 +1094,7 @@ double	get_scrollbar_value(Tool *scrollbar)
 Tool	*create_icon_view(GtkListStore *store)
 {
 	Tool *icon_view = gtk_icon_view_new_with_model(GTK_TREE_MODEL(store));
+	sf_set_name(icon_view, "icon_view");
 	g_object_unref(store);
 	return (icon_view);
 }
@@ -1105,6 +1148,7 @@ Tool	*create_about_dialog(GtkWindow *parent,
 			const char *program_name, const char *version, const char *comments)
 {
 	Tool *dialog = gtk_about_dialog_new();
+	sf_set_name(dialog, "dialog");
 	gtk_about_dialog_set_program_name(GTK_ABOUT_DIALOG(dialog), program_name);
 	gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dialog), version);
 	gtk_about_dialog_set_comments(GTK_ABOUT_DIALOG(dialog), comments);
@@ -1204,6 +1248,7 @@ Tool	*create_stack_switcher(Tool *stack)
 {
 	Tool *switcher = gtk_stack_switcher_new();
 	gtk_stack_switcher_set_stack(GTK_STACK_SWITCHER(switcher), GTK_STACK(stack));
+	sf_set_name(switcher, "switcher");
 	return (switcher);
 }
 
@@ -1213,6 +1258,7 @@ Tool	*create_header_bar(const char *title, const char *subtitle)
 	Tool *header_bar = gtk_header_bar_new();
 	gtk_header_bar_set_title(GTK_HEADER_BAR(header_bar), title);
 	gtk_header_bar_set_subtitle(GTK_HEADER_BAR(header_bar), subtitle);
+	sf_set_name(header_bar, "header_bar");
 	return (header_bar);
 }
 
@@ -1234,11 +1280,6 @@ void	add_to_popover(Tool *popover, Tool *widget)
 	gtk_container_add(GTK_CONTAINER(popover), widget);
 }
 
-// Function to create a progress bar
-/*Tool *create_progress_bar(void) {
-    return gtk_progress_bar_new();
-}*/
-
 // Function to set the progress bar's fraction
 void	set_progress_bar_fraction(Tool *progress_bar, double fraction)
 {
@@ -1249,6 +1290,7 @@ void	set_progress_bar_fraction(Tool *progress_bar, double fraction)
 Tool	*create_stack_sidebar(Tool *stack)
 {
 	Tool *sidebar = gtk_stack_sidebar_new();
+	sf_set_name(sidebar, "sidebar");
 	gtk_stack_sidebar_set_stack(GTK_STACK_SIDEBAR(sidebar), GTK_STACK(stack));
 	return (sidebar);
 }
@@ -1257,6 +1299,7 @@ Tool	*create_stack_sidebar(Tool *stack)
 Tool	*create_flow_box(Tool *container)
 {
 	Tool *flow_box = gtk_flow_box_new();
+	sf_set_name(flow_box, "flow_box");
 	gtk_container_add(GTK_CONTAINER(container), flow_box);
 	return (flow_box);
 }
@@ -1283,6 +1326,7 @@ void	set_level_bar_value(Tool *level_bar, double value)
 Tool	*create_shortcut_button(const char *label, GCallback callback, gpointer data)
 {
 	Tool *shortcut_button = gtk_shortcut_label_new(label);
+	sf_set_name(shortcut_button, "shortcut_button");
 	g_signal_connect(shortcut_button, "clicked", callback, data);
 	return (shortcut_button);
 }
@@ -1330,6 +1374,7 @@ Tool	*create_placeholder(const char *text)
 Tool	*create_list_box(Tool *container)
 {
 	Tool *list_box = gtk_list_box_new();
+	sf_set_name(list_box, "list_box");
 	gtk_container_add(GTK_CONTAINER(container), list_box);
 	return (list_box);
 }
@@ -1352,6 +1397,7 @@ Tool	*create_sidebar(Tool *container)
 Tool	*create_popover_menu(Tool *relative_to, Tool *menu)
 {
 	Tool *popover = gtk_popover_menu_new();
+	sf_set_name(popover, "popover");
 	gtk_popover_set_relative_to(GTK_POPOVER(popover), relative_to);
 	gtk_popover_set_modal(GTK_POPOVER(popover), G_MENU_MODEL(menu));
 	return (popover);
@@ -1373,6 +1419,7 @@ Tool	*create_preferences_dialog(GtkWindow *parent)
 {
 	Tool *dialog = gtk_dialog_new_with_buttons("Preferences", parent,
 	GTK_DIALOG_MODAL, "_OK", GTK_RESPONSE_OK, "_Cancel", GTK_RESPONSE_CANCEL, NULL);
+	sf_set_name(dialog, "dialog");
 	return (dialog);
 }
 
@@ -1381,6 +1428,7 @@ Tool	*create_context_menu(Tool *widget, GCallback callback, gpointer data)
 {
 	Tool *menu = gtk_menu_new();
 	g_signal_connect(menu, "button-press-event", callback, data);
+	sf_set_name(menu, "menu");
 	return (menu);
 }
 
@@ -1393,13 +1441,7 @@ void	add_menu_item_to_context_menu(Tool *menu,
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
 }
 
-// Function to create a grid
-/*Tool *create_grid(Tool *container) {
-    Tool *grid = gtk_grid_new();
-    gtk_container_add(GTK_CONTAINER(container), grid);
-    return grid;
-}
-*/
+
 // Function to attach a widget to a grid
 void	attach_to_grid(Tool *grid,
 			Tool *widget, int left, int top, int width, int height) 
@@ -1413,29 +1455,11 @@ Tool	*create_scale_button(GtkIconSize size, double min, double max, double step)
 	return (gtk_scale_button_new(size, min, max, step, NULL));
 }
 
-/*void set_label_color(Tool *label, const char *css_color) {
-    GtkCssProvider *provider = gtk_css_provider_new();
-    char *css = g_strdup_printf("label { color: %s; }", css_color);
-    gtk_css_provider_load_from_data(provider, css, -1, NULL);
-    gtk_style_context_add_provider(gtk_widget_get_style_context(label), GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
-    g_free(css);
-    g_object_unref(provider);
-}
-*/
-
-// Function to create a drop down menu
-/*Tool *create_dropdown_menu(Tool *button, Tool *menu) {
-    Tool *dropdown = gtk_menu_new();
-    gtk_menu_attach_to_widget(GTK_MENU(dropdown), button, NULL);
-    gtk_menu_get_attach_widget(GTK_MENU(dropdown), menu);
-    return dropdown;
-}
-*/
-
 // Function to create a collapsible list
 Tool	*create_collapsible_list(Tool *container)
 {
 	Tool *collapsible_list = gtk_list_box_new();
+	sf_set_name(collapsible_list, "collapsible_list");
 	gtk_container_add(GTK_CONTAINER(container), collapsible_list);
 	return (collapsible_list);
 }
@@ -1450,6 +1474,7 @@ void	add_to_collapsible_list(Tool *collapsible_list, Tool *widget)
 Tool	*create_panel(Tool *container)
 {
 	Tool *panel = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	sf_set_name(panel, "panel");
 	gtk_container_add(GTK_CONTAINER(container), panel);
 	return (panel);
 }
@@ -1472,6 +1497,7 @@ void	add_to_breadcrumb(Tool *breadcrumb, Tool *widget)
 Tool	*create_header(Tool *container)
 {
 	Tool *header = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+	sf_set_name(header, "header");
 	gtk_container_add(GTK_CONTAINER(container), header);
 	return (header);
 }
@@ -1499,6 +1525,7 @@ void	add_to_toolbar(Tool *toolbar, Tool *widget)
 Tool	*create_navigation_bar(Tool *container)
 {
 	Tool *navigation_bar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+	sf_set_name(navigation_bar, "navigation_bar");
 	gtk_container_add(GTK_CONTAINER(container), navigation_bar);
 	return (navigation_bar);
 }
@@ -1513,6 +1540,7 @@ void	add_to_navigation_bar(Tool *navigation_bar, Tool *widget)
 Tool	*create_sidebar_menu(Tool *container)
 {
 	Tool *sidebar_menu = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	sf_set_name(sidebar_menu, "sidebar_menu");
 	gtk_container_add(GTK_CONTAINER(container), sidebar_menu);
 	return (sidebar_menu);
 }
@@ -1521,6 +1549,7 @@ Tool	*create_sidebar_menu(Tool *container)
 Tool	*create_navigation_drawer(Tool *container)
 {
 	Tool *navigation_drawer = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	sf_set_name(navigation_drawer, "navigation_drawer");
 	gtk_container_add(GTK_CONTAINER(container), navigation_drawer);
 	return (navigation_drawer);
 }
@@ -1535,6 +1564,7 @@ void	add_to_navigation_drawer(Tool *navigation_drawer, Tool *widget)
 Tool	*create_tile(Tool *container)
 {
 	Tool *tile = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+	sf_set_name(tile, "tile");
 	gtk_container_add(GTK_CONTAINER(container), tile);
 	return (tile);
 }
@@ -1543,6 +1573,7 @@ Tool	*create_tile(Tool *container)
 Tool	*create_tab_bar(Tool *container)
 {
 	Tool *tab_bar = gtk_notebook_new();
+	sf_set_name(tab_bar, "tab_bar");
 	gtk_container_add(GTK_CONTAINER(container), tab_bar);
 	return (tab_bar);
 }
@@ -1556,6 +1587,7 @@ void	add_to_tab_bar(Tool *tab_bar, Tool *widget, const char *label)
 // Function to create a sidebar panel
 Tool	*create_sidebar_panel(Tool *container) {
 	Tool *sidebar_panel = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	sf_set_name(sidebar_panel, "sidebar_panel");
 	gtk_container_add(GTK_CONTAINER(container), sidebar_panel);
 	return (sidebar_panel);
 }
@@ -1570,6 +1602,7 @@ void	add_to_sidebar_panel(Tool *sidebar_panel, Tool *widget)
 Tool	*create_floating_button(const char *label, GCallback callback, gpointer data)
 {
 	Tool *button = gtk_button_new_with_label(label);
+	sf_set_name(button, "button");
 	g_signal_connect(button, "clicked", callback, data);
 	return (button);
 }
@@ -1578,6 +1611,7 @@ Tool	*create_floating_button(const char *label, GCallback callback, gpointer dat
 Tool	*create_notification_banner(const char *message)
 {
 	Tool *notification_banner = gtk_label_new(message);
+	sf_set_name(notification_banner, "notification_banner");
 	return (notification_banner);
 }
 
@@ -1585,6 +1619,7 @@ Tool	*create_notification_banner(const char *message)
 Tool	*create_dropdown_list(Tool *container)
 {
 	Tool *dropdown_list = gtk_combo_box_text_new();
+	sf_set_name(dropdown_list, "dropdown_list");
 	gtk_container_add(GTK_CONTAINER(container), dropdown_list);
 	return (dropdown_list);
 }
@@ -1599,6 +1634,7 @@ void	add_to_dropdown_list(Tool *dropdown_list, const char *item)
 Tool	*create_collapsible_sidebar(Tool *container)
 {
 	Tool *collapsible_sidebar = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	sf_set_name(collapsible_sidebar, "collapsible_sidebar");
 	gtk_container_add(GTK_CONTAINER(container), collapsible_sidebar);
 	return (collapsible_sidebar);
 }
@@ -1607,6 +1643,7 @@ Tool	*create_collapsible_sidebar(Tool *container)
 Tool	*create_notification_center(Tool *container)
 {
 	Tool *notification_center = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	sf_set_name(notification_center, "notification_center");
 	gtk_container_add(GTK_CONTAINER(container), notification_center);
 	return (notification_center);
 }
@@ -1615,6 +1652,7 @@ Tool	*create_notification_center(Tool *container)
 Tool	*create_status_widget(const char *status)
 {
 	Tool *status_widget = gtk_label_new(status);
+	sf_set_name(status_widget, "status_widget");
 	return (status_widget);
 }
 
@@ -1622,6 +1660,7 @@ Tool	*create_status_widget(const char *status)
 Tool	*create_tooltip(const char *text)
 {
 	Tool *tooltip = gtk_label_new(text);
+	sf_set_name(tooltip, "tooltip");
 	return (tooltip);
 }
 
@@ -1629,6 +1668,7 @@ Tool	*create_tooltip(const char *text)
 Tool	*create_collapsible_header(const char *label)
 {
 	Tool *collapsible_header = gtk_expander_new(label);
+	sf_set_name(collapsible_header, "collapsible_header");
 	return (collapsible_header);
 }
 
@@ -1648,6 +1688,7 @@ gboolean	get_collapsible_header_expanded(Tool *collapsible_header)
 Tool	*create_section_header(const char *label)
 {
 	Tool *section_header = gtk_label_new(label);
+	sf_set_name(section_header, "section_header");
 	return (section_header);
 }
 
@@ -1662,6 +1703,7 @@ Tool	*create_sidebar_header(const char *label)
 Tool	*create_breadcrumb_header(const char *label)
 {
 	Tool *breadcrumb_header = gtk_label_new(label);
+	sf_set_name(breadcrumb_header, "breadcrumb_header");
 	return (breadcrumb_header);
 }
 // Function to create a toggle switch
@@ -1676,6 +1718,7 @@ Tool	*create_toggle_switch(gboolean state)
 Tool	*create_dropdown_button(const char *label, GCallback callback, gpointer data)
 {
 	Tool *button = gtk_button_new_with_label(label);
+	sf_set_name(button, "button");
 	g_signal_connect(button, "clicked", callback, data);
 	return (button);
 }
@@ -1684,6 +1727,7 @@ Tool	*create_dropdown_button(const char *label, GCallback callback, gpointer dat
 Tool	*create_quick_access_panel(Tool *container)
 {
 	Tool *quick_access_panel = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	sf_set_name(quick_access_panel, "quick_access_panel");
 	gtk_container_add(GTK_CONTAINER(container), quick_access_panel);
 	return (quick_access_panel);
 }
@@ -1711,6 +1755,7 @@ Tool	*create_floating_action_button(const char *label,
 				GCallback callback, gpointer data)
 {
 	Tool *button = gtk_button_new_with_label(label);
+	sf_set_name(button, "button");
 	g_signal_connect(button, "clicked", callback, data);
 	return (button);
 }
@@ -1755,6 +1800,7 @@ void add_to_quick_settings_panel(Tool *quick_settings_panel, Tool *widget)
 Tool	*create_navigation_menu(Tool *container)
 {
 	Tool *navigation_menu = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	sf_set_name(navigation_menu, "navigation_menu");
 	gtk_container_add(GTK_CONTAINER(container), navigation_menu);
 	return (navigation_menu);
 }
@@ -1809,6 +1855,7 @@ Tool	*create_navigation_footer(const char *label)
 Tool	*create_floating_toolbar(Tool *container)
 {
 	Tool *floating_toolbar = gtk_toolbar_new();
+	sf_set_name(floating_toolbar, "floating_toolbar");
 	gtk_container_add(GTK_CONTAINER(container), floating_toolbar);
 	return (floating_toolbar);
 }
@@ -1829,6 +1876,7 @@ Tool	*create_navigation_indicator(const char *label)
 Tool	*create_navigation_view(Tool *container)
 {
 	Tool *navigation_view = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	sf_set_name(navigation_view, "navigation_view");
 	gtk_container_add(GTK_CONTAINER(container), navigation_view);
 	return (navigation_view);
 }
@@ -1857,6 +1905,7 @@ Tool	*create_navigation_separator(void)
 Tool	*create_quick_action(const char *label, GCallback callback, gpointer data)
 {
 	Tool *quick_action = gtk_button_new_with_label(label);
+	sf_set_name(quick_action, "quick_action");
 	g_signal_connect(quick_action, "clicked", callback, data);
 	return (quick_action);
 }
@@ -1865,6 +1914,7 @@ Tool	*create_quick_action(const char *label, GCallback callback, gpointer data)
 Tool	*create_quick_shortcut(const char *label, GCallback callback, gpointer data)
 {
 	Tool *quick_shortcut = gtk_button_new_with_label(label);
+	sf_set_name(quick_shortcut, "quick_shortcut");
 	g_signal_connect(quick_shortcut, "clicked", callback, data);
 	return (quick_shortcut);
 }
@@ -1873,16 +1923,46 @@ Tool	*create_quick_shortcut(const char *label, GCallback callback, gpointer data
 Tool *create_quick_link(const char *label, GCallback callback, gpointer data)
 {
 	Tool *quick_link = gtk_button_new_with_label(label);
+	sf_set_name(quick_link, "quick_link");
 	g_signal_connect(quick_link, "clicked", callback, data);
 	return (quick_link);
 }
 
-// Função para iniciar o loop principal do GTK
-/*void loop(gpointer user_data)
+//////
+GtkWidget *create_box_horizontal()
 {
-    if (init_callback != NULL)
-    {
-        initialize_app(user_data);
-    }
-    gtk_main();
-}*/
+    return gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+}
+
+GtkWidget *add_icon_from_file(const char *file_path, int width, int height)
+{
+    GtkWidget *image = gtk_image_new_from_file(file_path);
+    sf_set_name(image, "img");
+    gtk_widget_set_size_request(image, width, height);
+    return image;
+}
+
+void add_to_box(GtkWidget *box, GtkWidget *widget)
+{
+    gtk_box_pack_start(GTK_BOX(box), widget, FALSE, FALSE, 5);
+}
+
+GtkWidget *add_list_box(GtkWidget *parent, int x, int y, int width, int height)
+{
+    GtkWidget *list_box = gtk_list_box_new();
+     sf_set_name(list_box, "list_box");
+    gtk_widget_set_size_request(list_box, width, height);
+    gtk_fixed_put(GTK_FIXED(parent), list_box, x, y);
+    return list_box;
+}
+
+void add_to_list_boxx(GtkWidget *list_box, GtkWidget *row)
+{
+    gtk_list_box_insert(GTK_LIST_BOX(list_box), row, -1);
+}
+
+void add_to_custom_list_box(GtkWidget *list_box, GtkWidget *row)
+{
+    gtk_list_box_insert(GTK_LIST_BOX(list_box), row, -1);
+}
+//////

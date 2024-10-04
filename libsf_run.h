@@ -53,6 +53,14 @@
 //typedef GtkWidget ImageFromPixbuf;
 //typedef GtkWidget EntryWithPlaceholder;
 
+
+
+
+
+
+
+
+
 const char*	get_text_button(GtkWidget *button);
 const char*	get_name(GtkWidget *widget);
 GtkStyleProvider*	get_style(GtkStyleContext *context);
@@ -82,7 +90,7 @@ void	sf_add_style(GtkStyleContext *context,	GtkStyleProvider *provider,	GtkStyle
 GtkWidget*	sf_new_image(const char *filename);
 GtkWidget*	sf_new_progress(void);
 void	sf_set_radio_group(GtkRadioButton *radio_button,	GSList *group);
-void	sf_print_fixed(GtkWidget *fixed,	GtkWidget *widget, int x, int y);
+void	print_fixed(GtkWidget *fixed, GtkWidget *widget, int x, int y);
 GtkWidget*	sf_new_label(const char *label);
 GtkWidget*	sf_new_window(GtkWindowType type);
 GtkWidget*	sf_new_entry(void);

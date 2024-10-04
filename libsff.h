@@ -138,6 +138,12 @@
         gtk_main(); \
     } while (0)
 
+#define set_margem_cima(widget, valor) gtk_widget_set_margin_top(widget, valor)
+#define set_margem_baixo(widget, valor) gtk_widget_set_margin_bottom(widget, valor)
+#define set_margem_esquerda(widget, valor) gtk_widget_set_margin_start(widget, valor)
+#define set_margem_direita(widget, valor) gtk_widget_set_margin_end(widget, valor)
+
+
 
 typedef void (*BCall)(GtkWidget *button, Pont data);
 typedef void (*ECall)(GtkWidget *Etext, Pont data);

@@ -4,7 +4,7 @@
 
 GtkWidget*	sf_new_button(const char *label)
 {
-	return gtk_button_new_with_label(label);
+	return (gtk_button_new_with_label(label));
 }
 
 void	sf_set_button_label(GtkWidget *button, const char *label)
@@ -24,7 +24,7 @@ void	sf_add_style(GtkStyleContext *context, GtkStyleProvider *provider, GtkStyle
 
 GtkWidget*	sf_new_image(const char *filename)
 {
-	return gtk_image_new_from_file(filename);	
+	return (gtk_image_new_from_file(filename));	
 }
 
 GtkWidget*	sf_new_progress(void)
@@ -359,11 +359,6 @@ GdkColor	get_color(GtkColorButton *color_button)
 PangoFontDescription*	get_font_description(GtkFontButton *font_button)
 {
 	return gtk_font_button_get_font_name(font_button);
-}
-
-gdouble	get_scale_value(GtkScale *scale)
-{
-	return gtk_range_get_value(GTK_RANGE(scale));
 }
 
 gdouble	get_spin_value(GtkSpinButton *spin)
