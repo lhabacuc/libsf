@@ -10,6 +10,12 @@
     add_row_to_list(list_box, list_box_row); \
 } while (0)
 
+#define create_labelx(txt) ({ \
+    GtkWidget *label = gtk_label_new(NULL); \
+    gtk_label_set_markup(GTK_LABEL(label), (txt)); \
+    label; \
+})
+
 #define ENDLISTR(list_box, row) do { \
     GtkWidget *list_box_row = gtk_list_box_row_new(); \
     gtk_container_add(GTK_CONTAINER(list_box_row), row); \
