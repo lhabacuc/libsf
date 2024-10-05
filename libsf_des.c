@@ -283,6 +283,71 @@ void	add_item_to_list_box(GtkWidget *list_box, const gchar *item_label)
 	gtk_list_box_insert(GTK_LIST_BOX(list_box), list_item, -1);
 }
 
+// Agrega un nuevo ítem a un GtkListBox
+void	add_list_item(GtkWidget *list_box, GtkWidget *new_row)
+{
+	GtkWidget	*row;
+
+	row = gtk_list_box_row_new();
+	gtk_container_add(GTK_CONTAINER(row), new_row);
+	gtk_list_box_insert(GTK_LIST_BOX(list_box), row, -1);
+	gtk_widget_show_all(GTK_WIDGET(list_box));
+}
+
+// Remueve los ítems seleccionados del GtkListBox
+void	remove_list_item(GtkWidget *list_box)
+{
+	GList	*selected_rows;
+	GList	*iter;
+
+	selected_rows = gtk_list_box_get_selected_rows(GTK_LIST_BOX(list_box));
+	iter = selected_rows;
+
+	while (iter != NULL)
+	{
+		GtkWidget	*row;
+
+		row = GTK_WIDGET(iter->data);
+		gtk_widget_destroy(row);
+		iter = iter->next;
+	}
+	g_list_free(selected_rows);
+}
+
+// Selecciona un ítem en el GtkListBox dado su índice
+void	select_item(GtkWidget *list_box, int index)
+{
+	GtkListBoxRow	*row;
+
+	row = GTK_LIST_BOX_ROW(gtk_list_box_get_row_at_index(GTK_LIST_BOX(list_box), index));
+	if (row)
+		gtk_list_box_select_row(GTK_LIST_BOX(list_box), row);
+}
+
+// Deselecciona todos los ítems del GtkListBox
+void	deselect_all_items(GtkWidget *list_box)
+{
+	gtk_list_box_unselect_all(GTK_LIST_BOX(list_box));
+}
+
+// Obtiene el ítem seleccionado del GtkListBox
+GtkWidget	*get_selected_item(GtkWidget *list_box)
+{
+	GList	*selected_rows;
+	GtkWidget	*row;
+
+	selected_rows = gtk_list_box_get_selected_rows(GTK_LIST_BOX(list_box));
+	if (selected_rows != NULL)
+	{
+		row = GTK_WIDGET(selected_rows->data);
+		g_list_free(selected_rows);
+		return (row);
+	}
+	g_list_free(selected_rows);
+	return (NULL);
+}
+
+
 void	hook_list(GtkWidget *list_box, GCallback callback, gpointer user_data)
 {
 	g_signal_connect(G_OBJECT(list_box), "row-activated", callback, user_data);
