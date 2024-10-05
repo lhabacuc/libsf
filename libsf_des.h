@@ -23,6 +23,8 @@
 } while (0)
 
 
+
+
 // Definir fonte diretamente na descrição da fonte do label
 #define label_set_font_desc(lbl, desc) \
 	gtk_widget_override_font(GTK_WIDGET(lbl), desc)
@@ -153,6 +155,12 @@ typedef struct
 }		HoverData;
 
 const	char* get_theme(void);
+
+void	add_list_item(GtkWidget *list_box, GtkWidget *new_row);
+void	remove_list_item(GtkWidget *list_box);
+void	select_item(GtkWidget *list_box, int index);
+void	deselect_all_items(GtkWidget *list_box);
+GtkWidget	*get_selected_item(GtkWidget *list_box);
 
 void update_position(GtkWidget *widget, int x, int y);
 
