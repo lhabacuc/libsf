@@ -6,6 +6,19 @@ void update_position(GtkWidget *widget, int x, int y)
     gtk_fixed_move(GTK_FIXED(gtk_widget_get_parent(widget)), widget, x, y);
 }
 
+// Função para criar um novo menu
+GtkWidget* shell_menu()
+{
+	GtkWidget *menu = gtk_menu_new();
+	return menu;
+}
+
+// Função para adicionar um item ao menu
+void add_item_shell(GtkWidget *menu, GtkWidget *item_menu)
+{
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item_menu);
+	gtk_widget_show(item_menu);
+}
 
 // Função para aplicar um CSS global a todos os widgets
 void apply_global_css(const gchar *css_file_path) {
