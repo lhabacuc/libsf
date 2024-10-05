@@ -9,6 +9,47 @@
 #include <string.h>
 #include <unistd.h>
 
+// funcao para criar combo box
+#define criate_combox() \
+	gtk_combo_box_text_new()
+
+// funcao para adicionar um item ao final do combo box de texto
+#define add_data_text(combo, id, text) \
+	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo), id, text)
+
+// funcao para adicionar um item no início do combo box de texto
+#define prepend_data_text(combo, id, text) \
+	gtk_combo_box_text_prepend(GTK_COMBO_BOX_TEXT(combo), id, text)
+
+// funcao para remover um item do combo box de texto pelo índice
+#define remove_data_text(combo, index) \
+	gtk_combo_box_text_remove(GTK_COMBO_BOX_TEXT(combo), index)
+
+// funcao para definir o item ativo no combo box de texto usando um ID
+#define set_active_text(combo, id) \
+	gtk_combo_box_set_active_id(GTK_COMBO_BOX(combo), id)
+
+// funcao para obter o texto do item ativo no combo box de texto
+#define get_active_text(combo) \
+	gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo))
+
+// funcao para limpar todos os itens do combo box de texto
+#define clear_combo(combo) \
+	gtk_combo_box_text_clear(GTK_COMBO_BOX_TEXT(combo))
+
+// funcao para definir um texto de dica (tooltip) para o combo box
+#define set_tooltip(combo, tooltip) \
+	gtk_widget_set_tooltip_text(GTK_WIDGET(combo), tooltip)
+
+// funcao para inserir um item em uma posição específica no combo box de texto
+#define insert_data_text(combo, index, text) \
+	gtk_combo_box_text_insert(GTK_COMBO_BOX_TEXT(combo), index, NULL, text)
+
+// funcao para definir a coluna de texto de entrada no combo box
+#define set_entry_column(combo, column) \
+	gtk_combo_box_set_entry_text_column(GTK_COMBO_BOX(combo), column)
+
+
 typedef struct s_element
 {
 	char name[50];
