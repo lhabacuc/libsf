@@ -21,6 +21,66 @@
 #define is_toggl_active(toggle) \
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(toggle))
 
+// GtkCheckButton macros
+// Macro para criar um botão de seleção (check button) com um rótulo
+#define new_check_button(label) \
+    ({ \
+        GtkWidget *check_button = gtk_check_button_new_with_label(label); \
+        check_button; \
+    })
+
+// Macro para definir o estado ativo de um botão de seleção
+#define set_check_button_active(button, active) \
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), active)
+
+// Macro para verificar se um botão de seleção está ativo
+#define is_check_button_active(button) \
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button))
+
+// GtkRadioButton macros
+// Macro para criar um botão de rádio com um rótulo, pertencente a um grupo
+#define new_radio_button(group, label) \
+    ({ \
+        GtkWidget *radio_button = gtk_radio_button_new_with_label(group, label); \
+        radio_button; \
+    })
+
+// Macro para verificar se um botão de rádio está ativo
+#define is_radio_button_active(button) \
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button))
+
+// Macro para definir o estado ativo de um botão de rádio
+#define set_radio_button_active(button, active) \
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), active)
+
+// GtkScale macros
+// Macro para criar um controle deslizante (scale) com intervalo e passo definidos
+#define new_scale(orientation, min, max, step) \
+    ({ \
+        GtkWidget *scale = gtk_scale_new_with_range(orientation, min, max, step); \
+        scale; \
+    })
+
+// Macro para definir o valor de um controle deslizante
+#define set_scale_value(scale, value) \
+    gtk_range_set_value(GTK_RANGE(scale), value)
+
+// Macro para obter o valor de um controle deslizante
+#define get_scale_value(scale) \
+    gtk_range_get_value(GTK_RANGE(scale))
+
+// GtkSwitch macros
+// Macro para criar um interruptor (switch)
+#define new_switch() \
+    gtk_switch_new()
+
+// Macro para definir o estado ativo de um interruptor
+#define set_switch_active(switch, active) \
+    gtk_switch_set_active(GTK_SWITCH(switch), active)
+
+// Macro para verificar se um interruptor está ativo
+#define is_switch_active(switch) \
+    gtk_switch_get_active(GTK_SWITCH(switch))
 
 //typedef GtkWidget CheckButton;
 //typedef GtkWidget ToggleButton;
