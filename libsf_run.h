@@ -3,6 +3,25 @@
 
 # include "libsf.h"
 
+// GtkFileChooserButton macros
+// Macro para criar um botão de escolha de arquivo com a ação de abrir
+#define create_file_chooser_button(opene) \
+    gtk_file_chooser_button_new(opene, GTK_FILE_CHOOSER_ACTION_OPEN)
+
+// Macro para obter o nome do arquivo selecionado no botão de escolha de arquivo
+#define get_file_chooser_file(button) \
+    gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(button))
+
+// GtkToggleButton macros
+// Macro para criar um botão de alternância (toggle button) com um rótulo
+#define new_toggle(label) \
+    gtk_toggle_button_new_with_label(label)
+
+// Macro para verificar se um botão de alternância está ativo
+#define is_toggl_active(toggle) \
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(toggle))
+
+
 //typedef GtkWidget CheckButton;
 //typedef GtkWidget ToggleButton;
 //typedef GtkWidget RadioButton;
