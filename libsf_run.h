@@ -135,7 +135,7 @@
 
 
 
-
+void mause_click(GtkWidget *widget, int button, void (*func)(GtkWidget*, void*), void *pointer);
 
 
 
