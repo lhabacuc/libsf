@@ -2,6 +2,32 @@
 # include "libsf.h"
 # include "libsf_run.h"
 
+typedef struct
+{
+	int button; // Número do botão do mouse
+	void (*func)(GtkWidget*, void*); // Função a ser chamada no evento
+	void *pointer; // Ponteiro para dados adicionais
+} dataste;
+
+// Função chamada ao pressionar um botão do mouse
+static void on_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer data)
+{
+	dataste *tup = (dataste *)data;
+	if (event->button == tup->button)
+		tup->func(widget, tup->pointer);
+}
+
+// Configura um evento de clique do mouse em um widget
+void mause_click(GtkWidget *widget, int button, void (*func)(GtkWidget*, void*), void *pointer)
+{
+	dataste *tup = g_new(dataste, 1);
+	tup->func = func;
+	tup->button = button;
+	tup->pointer = pointer;
+	g_signal_connect(widget, "button-press-event", G_CALLBACK(on_button_press_event), tup);
+}
+
+
 GtkWidget*	sf_new_button(const char *label)
 {
 	return (gtk_button_new_with_label(label));
