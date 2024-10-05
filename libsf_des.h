@@ -206,7 +206,8 @@ GtkCssProvider*	create_css_provider(const gchar *css);
 
 GtkWidget*	list_box(void);
 
-void	add_item_to_list_box(GtkWidget *list_box, const gchar *item_label);
+void add_item_shell(GtkWidget *menu, GtkWidget *item_menu);
+GtkWidget* shell_menu();
 
 void	hook_list(GtkWidget *list_box, GCallback callback, gpointer user_data);
 
